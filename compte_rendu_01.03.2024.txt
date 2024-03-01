@@ -1,0 +1,30 @@
+2 sources de données :
+- France Travail :
+    Techno : Python. -> essayer de générer le token en Python
+- The Muse :
+    Techno : Python. 
+
+Données sur chaque offre :
+    - ID technique (auto-généré)
+    - ID fonctionnel (ID de l'offre sur France Travail, sur The Muse)
+    - Libellé
+    - Description (=corps du job, parsing à effectuer)
+    - Lieu
+    - Date de publication (est-ce qu'il y a un historique ?)
+    - Niveau de qualification (Technicien/ cadre/docteur)
+    - Catégorie professionnelle (Data scientist, RH ...)
+    - Niveau d'expérience
+    - Type de contrat (CDD, CDI, Freelance...)
+    - Remote ?
+    - Salaire?
+    - Lien URL
+
+ 
+Github  : 
+    - Chacun sa branche dans un premier temps -> pour mercredi avoir fini le code pour télécharger les 2 sources.
+    - Emmanuelle : The Muse
+        * Essayer de recup sur une offre toutes les données
+        * Automatisation : essayer de filtrer que les entreprise française
+    - Célestine & Fabien : France Travail
+
+https://www.aranacorp.com/fr/bonnes-pratiques-pour-creer-un-projet-python/
