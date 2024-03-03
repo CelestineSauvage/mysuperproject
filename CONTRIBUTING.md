@@ -7,23 +7,37 @@ FEV24-BDE-JOBMARKET welcomes contributions from the community.
 This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 ## Setting up your own fork of this repo.
 
-- Clone the repo `git clone git@github.com:YOUR_GIT_USERNAME/FEV24-BDE-JOBMARKET.git`
-- Enter the directory `cd FEV24-BDE-JOBMARKET`
+- Clone the repo :
+```shell script
+git clone git@github.com:YOUR_GIT_USERNAME/FEV24-BDE-JOBMARKET.git
+```
+
+- Enter the directory :
+```shell script
+cd FEV24-BDE-JOBMARKET
+```
 
 ## Setting up your own virtual environment
 
-Run this command to create a virtual environment :
-$ python3 -m venv FEV24-BDE-JOBMARKET 
+Create a virtual environment :
+```shell script
+python3 -m venv FEV24-BDE-JOBMARKET 
+```
 
-Then run this command to activate the virtual environment :
-$ source .venv/bin/activate
+Activate the virtual environment :
+```shell script
+source .venv/bin/activate
+```
 
 ## Install packages with pip and requirements.txt
 
-Run this command to install automatically all the required packages according to the configuration file 'requirements.txt' :
-$ pip3 install -r requirements.txt
+Install automatically all the required packages according to the configuration file 'requirements.txt' :
+```shell script
+pip3 install -r requirements.txt
+```
 
 ## Create a new branch to work on your contribution
 
-Run this command :
-$ git checkout -b my_contribution
+```shell script
+git checkout -b my_contribution
+```
