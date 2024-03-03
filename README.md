@@ -16,5 +16,5 @@ Le sujet détaillé se retrouve [ici](https://docs.google.com/document/d/1qnaWpb
 $ python3 __main__.py
 ```
 
-## Participer
-Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+## Comment participer
+Lire le fichier [CONTRIBUTING.md](CONTRIBUTING.md).
