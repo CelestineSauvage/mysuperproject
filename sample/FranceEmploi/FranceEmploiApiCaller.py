@@ -1,4 +1,5 @@
 from helpers.HttpCaller import HttpCaller
+from helpers.Oauth2Helper import Oauth2Helper
 import json
 
 class FranceEmploiApiCaller:
@@ -10,43 +11,28 @@ class FranceEmploiApiCaller:
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
         self.client_secret = client_secret
+        self.access_token_url = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
+        self.jobs_search_url = "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search"
+        self.access_token = ""
     
-    def get_access_token(self, scope, params = ''):
-        ### Function to get an access token via the 'client_credentials' OAuth2 Grant Type
+    def authenticate(self, scope, params = ''):
+        ### Function to get an access token via OAuth2 Grant Type
         # Documentation here :  
         # - https://francetravail.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
-        # - https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/
+        self.access_token = Oauth2Helper.get_access_token_by_client_credential(self.access_token_url, scope, self.client_id, self.client_secret, params)
 
-        url = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
-
-        content_type = "application/x-www-form-urlencoded"
-        
-        body = {
-            "grant_type": "client_credentials", 
-            "client_id": self.client_id, 
-            "client_secret": self.client_secret, 
-            "scope": scope,
-        }
-
-        response = HttpCaller.post(url, content_type, params, body)
-        # Convert response to a JSON object
-        jsonResponse = json.loads(response.text)
-        access_token = jsonResponse["access_token"]
-        expire = jsonResponse["expires_in"]
-        print("Obtained access_token", access_token, "that expires in", expire / 60, "minutes.")
-        
-        return access_token
-
-
-    def get_offres_demploi_par_criteres(self, access_token, criteres={}): #, criteres
-        ### Function to get an access token via the 'client_credentials' OAuth2 Grant Type
+    def get_jobs_by_criterias(self, criteres={}):
+        ### Function to get jobs list by criterias
         ### Documentation here : 
-        ### - https://francetravail.io/data/api/offres-emploi?tabgroup-api=documentation
-        ### - https://francetravail.io/data/api/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
-        
-        url = "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search"
+        # - https://francetravail.io/data/api/offres-emploi?tabgroup-api=documentation
+        # - https://francetravail.io/data/api/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
     
-        response = HttpCaller.get(url, access_token, criteres)
+        headers = {
+            "Authorization": "Bearer " + self.access_token,
+            "Accept": "application/json"
+        }
+    
+        response = HttpCaller.get(self.jobs_search_url, headers, criteres)
         # Convert response to a JSON object
         jsonResponse = json.loads(response.text)
         

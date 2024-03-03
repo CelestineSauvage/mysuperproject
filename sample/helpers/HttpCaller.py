@@ -7,20 +7,13 @@ class HttpCaller:
         pass
 
     @staticmethod
-    def get(url, access_token, params={}):
+    def get(url, header_params={}, params={}):
         ### Static function to execute a GET query with OAuth2 authentication
-        
-        bearer = "Bearer " + access_token
-        
-        headers = {
-            "Authorization": bearer,
-            "Accept": "application/json"
-        }
         
         # Get the results    
         response = requests.get(
             url,
-            headers = headers,
+            headers = header_params,
             params = params
         )
         
@@ -28,18 +21,14 @@ class HttpCaller:
         return response
 
     @staticmethod
-    def post(url, content_type, params={}, body={}):
+    def post(url, header_params={}, params={}, body={}):
         ### Static function to execute a POST query with OAuth2 authentication
-        
-        headers = {
-            "Content-Type": content_type
-        }
         
         # Get the access token
         response = requests.post(
             url,
             data = body,
-            headers = headers,
+            headers = header_params,
             params = params,
         )
         
