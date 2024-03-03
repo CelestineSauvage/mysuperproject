@@ -1,12 +1,21 @@
-from FranceEmploiApiCaller import FranceEmploiApiCaller
+import yaml
+import os
+
+from FranceEmploi.FranceEmploiApiCaller import FranceEmploiApiCaller
 
 
-france_emploi_client_id = "PAR_francetravailpourproj_07af7086caa6684d7bfdeb93773ac2232bcab87c28126890c3dd2c3a7d41ae23"
-france_emploi_client_secret = "61bd84de5eacdf9e4654c8bd3e67faff2781e5a93fa9c1186baa274a2bf933d3"
+current_path = os.path.split(os.path.realpath(__file__))[0]
 
+# Load credentials of API providers
+with open(current_path + "/api_providers_credentials.yml", "r") as ymlfile:
+    credentials = yaml.safe_load(ymlfile)
+france_emploi_client_id = credentials["france_emploi"]["client_id"]
+france_emploi_client_secret = credentials["france_emploi"]["client_secret"]
+
+# Initialize the France Emploi API caller
 franceEmploi = FranceEmploiApiCaller(france_emploi_client_id, france_emploi_client_secret)
 
-# Authenticate to the France Emploi services
+# Authenticate to the France Emploi API services
 access_token = franceEmploi.get_access_token("api_offresdemploiv2 o2dsoffre", {"realm": "/partenaire"})
 
 # Gets the jobs list with the criteria (=filter) on 'departement' with value '30'
