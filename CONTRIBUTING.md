@@ -1,10 +1,9 @@
-How to develop on this project
+# How to develop on this project
 
-FEV24-BDE-JOBMARKET welcomes contributions from the community.
+**First you need PYTHON3!**
 
-**You need PYTHON3!**
+This instructions are for linux based systems (Linux, MacOS, BSD, etc.)
 
-This instructions are for linux base systems. (Linux, MacOS, BSD, etc.)
 ## Setting up your own fork of this repo.
 
 - Clone the repo :
