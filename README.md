@@ -13,7 +13,7 @@ Le sujet détaillé se retrouve [ici](https://docs.google.com/document/d/1qnaWpb
 
 ## Utilisation
 ```bash
-$ python3 __main__.py
+$ python3 sample/__main__.py
 ```
 
 ## Participer
