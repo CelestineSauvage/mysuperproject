@@ -1,5 +1,6 @@
 import json
-from helpers.HttpCaller import HttpCaller
+import sys
+from helpers.HttpCaller import HttpCaller, UnauthorizedException
 
 class Oauth2Helper:
     ### Class for OAuth2 authentication
@@ -22,6 +23,10 @@ class Oauth2Helper:
         }
 
         response = HttpCaller.post(access_token_url, headers, params, body)
+
+        if response.status_code == 401 :
+            raise UnauthorizedException("Wrong client_id or client_secret")
+            sys.exit(1)
         
         # Convert response to a JSON object
         jsonResponse = json.loads(response.text)

@@ -38,3 +38,6 @@ class HttpCaller:
     @classmethod
     def __print_status_code(self, url, response):
         print("Status Code for HTTP POST on", url, ':', response.status_code)
+
+class UnauthorizedException(Exception):
+    pass
