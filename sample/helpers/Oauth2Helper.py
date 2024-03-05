@@ -8,7 +8,7 @@ class Oauth2Helper:
         pass
 
     @staticmethod
-    def get_access_token_by_client_credential(access_token_url, scope, client_id, client_secret, params = ''):
+    def get_access_token_by_client_credential(access_token_url: str, scope: str, client_id: str, client_secret: str, params: dict = {}) -> str:
         ### Function to get an access token via the 'client_credentials' OAuth2 Grant Type
         # - https://www.oauth.com/oauth2-servers/access-tokens/client-credentials/
 
@@ -21,7 +21,7 @@ class Oauth2Helper:
             "scope": scope,
         }
 
-        response = HttpCaller.post(access_token_url, headers, params, body)
+        response = HttpCaller.post(url = access_token_url, headers = headers, params = params, body = body)
         
         # Convert response to a JSON object
         jsonResponse = json.loads(response.text)

@@ -7,34 +7,35 @@ class HttpCaller:
         pass
 
     @staticmethod
-    def get(url, header_params={}, params={}):
+    def get(url: str, headers: dict = {}, params: dict = {}, cookies: dict = {}) -> requests.Response:
         ### Static function to execute a GET query with OAuth2 authentication
         
         # Get the results    
         response = requests.get(
             url,
-            headers = header_params,
-            params = params
+            headers = headers,
+            params = params,
+            cookies= cookies
         )
         
-        HttpCaller.__print_status_code(url, response)
+        HttpCaller.__print_status_code(url, "GET", response)
         return response
 
     @staticmethod
-    def post(url, header_params={}, params={}, body={}):
+    def post(url: str, headers: dict = {}, params: dict = {}, body: dict = {}) -> requests.Response:
         ### Static function to execute a POST query with OAuth2 authentication
         
         # Get the access token
         response = requests.post(
             url,
             data = body,
-            headers = header_params,
+            headers = headers,
             params = params,
         )
         
-        HttpCaller.__print_status_code(url, response)
+        HttpCaller.__print_status_code(url, "POST", response)
         return response
     
     @classmethod
-    def __print_status_code(self, url, response):
-        print("Status Code for HTTP POST on", url, ':', response.status_code)
+    def __print_status_code(self, url: str, verb: str, response: requests.Response):
+        print("Status Code for HTTP",verb,"on", url, ':', response.status_code)

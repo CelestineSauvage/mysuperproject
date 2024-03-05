@@ -8,20 +8,23 @@ class FranceEmploiApiCaller:
     # - Workflow to follow to use the France Travail Connect APIs : https://francetravail.io/data/documentation/comprendre-dispositif-pole-emploi-connect/open-id-connect
     # - APIs catalog : https://francetravail.io/data/api
     
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id: str, client_secret: str):
         self.client_id = client_id
         self.client_secret = client_secret
         self.access_token_url = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
         self.jobs_search_url = "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search"
         self.access_token = ""
     
-    def authenticate(self, scope, params = ''):
+    def authenticate(self, scope: str, params: dict = {}):
         ### Function to get an access token via OAuth2 Grant Type
         # Documentation here :  
         # - https://francetravail.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
-        self.access_token = Oauth2Helper.get_access_token_by_client_credential(self.access_token_url, scope, self.client_id, self.client_secret, params)
+        self.access_token = Oauth2Helper.get_access_token_by_client_credential(
+            access_token_url = self.access_token_url, scope = scope, client_id = self.client_id,
+            client_secret = self.client_secret, params = params
+        )
 
-    def get_jobs_by_criterias(self, criteres={}):
+    def get_jobs_by_criterias(self, criteres: dict = {}) -> dict:
         ### Function to get jobs list by criterias
         ### Documentation here : 
         # - https://francetravail.io/data/api/offres-emploi?tabgroup-api=documentation
@@ -32,7 +35,7 @@ class FranceEmploiApiCaller:
             "Accept": "application/json"
         }
     
-        response = HttpCaller.get(self.jobs_search_url, headers, criteres)
+        response = HttpCaller.get(url = self.jobs_search_url, headers = headers, params = criteres)
         # Convert response to a JSON object
         jsonResponse = json.loads(response.text)
         
