@@ -17,7 +17,7 @@ class FranceEmploiApiCaller:
         self.client_id = client_id
         self.client_secret = client_secret
         self.access_token_url = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token"
-        self.jobs_search_url = "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search"
+        self.jobs_search_url = "https://api.pole-emploi.io/partenaire/offresdemploi/v2/offres/search" #TODO : mettre en paramètres si on veut utiliser une autre API de France Travail 
         self.access_token = ""
     
     def authenticate(self, scope, params = ''):
@@ -102,8 +102,8 @@ class DepartmentJobsCaller:
                 json_file.close()
                 sys.exit(1)
 
-            print(f"range_max = {self.range_max}")
-            print(f"total = {total}")
+            #print(f"range_max = {self.range_max}")
+            #print(f"total = {total}")
             total = self.__retrieve_number_of_jobs(response.headers) - 1
 
             json_response = json.loads(response.text)
