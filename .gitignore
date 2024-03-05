@@ -5,3 +5,13 @@ lib64
 share
 __pycache__/
 **/.vscode/
+
+# DOWNLOAD FILES
+downloads/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
