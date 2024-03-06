@@ -1,0 +1,66 @@
+Compte rendu réunion 05/03/2024
+
+Point aborder pdt la réunion
+
+    Version de Python : 3.12 -> si besoin on changera
+
+    Github : sur la base du main, on crée une branche develop et nos features partent de cette branche
+
+    Git graph : git log --oneline --graph --decorate --all
+
+    Commit message : 
+
+    feat Commits, that adds or remove a new feature
+
+    fix Commits, that fixes a bug
+
+    refactor Commits, that rewrite/restructure your code, however does not change any API behaviour 
+
+    perf Commits are special refactor commits, that improve performance
+
+    style Commits, that do not affect the meaning (white-space, formatting, missing semi-colons, etc)
+
+    test Commits, that add missing tests or correcting existing tests
+
+    docs Commits, that affect documentation only
+
+    build Commits, that affect build components like build tool, ci pipeline, dependencies, project version, ...
+
+    ops Commits, that affect operational components like infrastructure, deployment, backup, recovery, ...
+
+    chore Miscellaneous commits e.g. modifying .gitignore
+
+-> Dans sa branche, des commits intermédiaires avec des messages pas importants, puis dans le merge un commit conventionnel + stash des commits intermédiaires.
+
+    changer en sample -> src *
+
+    A terme, lorsqu'on utiliser Docker, nous devrons stocker les credentials sur l'environnement GitHub plutôt que dans des fichiers de credentials tel que l'"api_providers_credentials.yml".
+
+    Réorganiser le code source (répertoire "src") au niveau des répertoires "FranceEmploi" et "TheMuse" pour les placer dans un répertoire relatif à l'extraction des données.
+
+
+The Muse :
+
+     Une partie du parsing a été fait sur les attributs : 
+
+    id, nom de la fonction, nom, description, localisation, catégories, date de publication, niveau, type, lien
+
+
+Fabien : voir comment sur The Muse
+
+A voir avec Antoine:
+    - droit github
+
+    - empecher les commits 
+
+    (https://stackoverflow.com/questions/46146491/prevent-pushing-to-master-on-github)
+
+    - ajout des variables d'envroement / credential (Ci-CD)
+
+    - problème des données incrémentals sur Muse
+
+    - conseil sur format de données en base
+
+
+
+
