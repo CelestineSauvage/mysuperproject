@@ -1,8 +1,4 @@
-bin
-include
-lib
-lib64
-share
+.env
 __pycache__/
 **/.vscode/
 

@@ -1,6 +1,6 @@
 # How to develop on this project
 
-**First you need PYTHON3!**
+**First you need PYTHON3 in version 3.12.0 !**
 
 This instructions are for linux based systems (Linux, MacOS, BSD, etc.)
 
@@ -20,7 +20,7 @@ cd FEV24-BDE-JOBMARKET
 
 Create a virtual environment :
 ```shell script
-python3 -m venv FEV24-BDE-JOBMARKET 
+virtualenv .env 
 ```
 
 Activate the virtual environment :
