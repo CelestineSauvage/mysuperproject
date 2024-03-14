@@ -11,14 +11,17 @@ france_emploi_client_id = credentials["france_emploi"]["client_id"]
 france_emploi_client_secret = credentials["france_emploi"]["client_secret"]
 
 # Initialize the France Emploi API caller
-franceEmploi = FranceEmploiApiCaller(france_emploi_client_id, france_emploi_client_secret)
+franceEmploi = FranceEmploiApiCaller(
+    france_emploi_client_id, france_emploi_client_secret)
 
 # Authenticate to the France Emploi API services
-franceEmploi.authenticate("api_offresdemploiv2 o2dsoffre", {"realm": "/partenaire"})
+franceEmploi.authenticate("api_offresdemploiv2 o2dsoffre", {
+                          "realm": "/partenaire"})
 
-response = franceEmploi.get_jobs_by_criterias({"departement":"30"})
+response = franceEmploi.get_jobs_by_criterias({"departement": "30"})
 
 print(response.headers)
 
-departement_download = DepartmentJobsCaller(franceEmploi, "30", "/home/celestine/smart_emploi_api/downloads")
+departement_download = DepartmentJobsCaller(
+    franceEmploi, "30", "/home/celestine/smart_emploi_api/downloads")
 departement_download.get_jobs_by_department()

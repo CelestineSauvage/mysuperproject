@@ -3,8 +3,8 @@ import pandas as pd
 
 
 class DataDump:
-    ### Class for transforming Web results into a data-dump cleaned to be used for an upload to a DB or saved to a CSV file
-    
+    # Class for transforming Web results into a data-dump cleaned to be used for an upload to a DB or saved to a CSV file
+
     def __init__(self):
         self.df = pd.DataFrame()
 
