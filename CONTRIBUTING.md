@@ -20,7 +20,7 @@ cd FEV24-BDE-JOBMARKET
 
 Create a virtual environment :
 ```shell script
-virtualenv .env 
+python3 -m venv .env 
 ```
 
 Activate the virtual environment :
@@ -39,4 +39,10 @@ pip3 install -r requirements.txt
 
 ```shell script
 git checkout -b my_contribution
+```
+
+## Quit the virtual environment
+
+```shell script
+deactivate
 ```
