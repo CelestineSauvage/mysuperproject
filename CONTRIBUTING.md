@@ -25,7 +25,7 @@ python3 -m venv .env
 
 Activate the virtual environment :
 ```shell script
-source .venv/bin/activate
+source .env/bin/activate
 ```
 
 ## Install packages with pip and requirements.txt
