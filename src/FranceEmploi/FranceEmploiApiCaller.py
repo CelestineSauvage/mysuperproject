@@ -58,12 +58,24 @@ class DepartmentJobsCaller:
     Default range from France Emploi API to get a list of jobs is 150
     """
 
-    def __init__(self, FranceEmploiApiCaller, department, path="."):
+    def __init__(self, FranceEmploiApiCaller: FranceEmploiApiCaller, path="./",
+                 **optionnals):
+        """
+        Iniatialize request for a specific search. Some arguments are optionnals
+
+        Args:
+            FranceEmploiApiCaller : calling the France Emploi APIs with OAth2 authentication
+            path (string) : directory where the data will be stored
+            departement (string) : representative of department in France
+            publieeDepuis (int) :  1, 3, 7, 14 or 31
+            maxCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z'
+            minCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z')
+        """
         self.FranceEmploiApiCaller = FranceEmploiApiCaller
-        self.department = department
+        self.criteras = optionnals
         self.range_min = 0
         self.range_max = 149
-        f_name = self.__create_file_name(department, path)
+        f_name = self.__create_file_name(self.criteras["departement"], path)
         self.json_file_path = Path(path) / f"{f_name}.json"
 
     def __create_file_name(self, department, path):
@@ -71,13 +83,15 @@ class DepartmentJobsCaller:
         Create file name based on actual day : format Y_m_d_H_M_S_dep_FRANCE_TRAVAIL_API.json
         """
         now = datetime.datetime.now()
-        dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{department}_{dt_string}"
+        self.dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
+        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{
+            department}_{self.dt_string}"
         return file_name
 
     def __retrieve_number_of_jobs(self, header: dict):
         """
-        Retrieve number of jobs for one departement. This information is store in the header of HTTP response for GET request as 
+        Retrieve number of jobs for one departement. This information is store
+        in the header of HTTP response for GET request as
         'Content-Range': 'offres 0-149/3430', value is after /
         """
 
@@ -100,17 +114,16 @@ class DepartmentJobsCaller:
         json_file = open(self.json_file_path, "w")
         total = 150
 
-        while self.range_max < total:  # tant qu'on n'a pas reçu tous les jobs
+        # tant qu'on n'a pas reçu tous les jobs
+        while self.range_max < (min(total, 3000)):
 
-            criteres = {
-                "departement": self.department,
-                "range": f"{str(self.range_min)}-{str(self.range_max)}"
-            }
+            self.criteras["range"] = f"{
+                str(self.range_min)}-{str(self.range_max)}"
 
             try:  # If exception raise, close the file and quit the program
                 response = self.FranceEmploiApiCaller.get_jobs_by_criterias(
-                    criteres)
-            except:
+                    self.criteras)
+            except UnauthorizedException:
                 json_file.close()
                 sys.exit(1)
 
@@ -124,7 +137,9 @@ class DepartmentJobsCaller:
 
             self.range_min = self.range_max + 1
             self.range_max = min(self.range_max+150, total)
-
+        metadata = {"request": self.criteras,
+                    "date": self.dt_string}
+        json.dump(metadata, json_file)
         json_file.close()
 
 

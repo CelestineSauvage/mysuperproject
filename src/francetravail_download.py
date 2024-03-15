@@ -1,7 +1,7 @@
 import yaml
 import os
-from FranceEmploi.FranceEmploiApiCaller import FranceEmploiApiCaller, DepartmentJobsCaller
-from Indeed.IndeedApiCaller import IndeedApiCaller
+from FranceEmploi.FranceEmploiApiCaller \
+    import FranceEmploiApiCaller, DepartmentJobsCaller
 
 current_path = os.path.split(os.path.realpath(__file__))[0]
 # Load credentials of API providers
@@ -23,5 +23,7 @@ response = franceEmploi.get_jobs_by_criterias({"departement": "30"})
 print(response.headers)
 
 departement_download = DepartmentJobsCaller(
-    franceEmploi, "30", "/home/celestine/smart_emploi_api/downloads")
+    franceEmploi,
+    path="/home/celestine/smart_emploi_api/downloads",
+    departement="30")
 departement_download.get_jobs_by_department()
