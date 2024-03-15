@@ -6,6 +6,19 @@ import sys
 from pathlib import Path
 
 FRANCE_TRAVAIL_FILE_NAME = "FRANCE_TRAVAIL_API"
+JSON_KEY = {
+    "technical_id": "id",
+    "place": "lieuTravail",
+    "publication_date": "dateCreation",
+    "actualisation_date": "dateActualisation",
+    "rome_libelle": "romeLibelle",
+    "appellation_libelle": "appellationlibelle",
+    "contrat_type": "typeContrat",
+    "experience": "experienceLibelle",
+    "salary": "salaire",
+    "sector": "secteurActiviteLibelle",
+    "qualification": "qualificationLibelle"
+}
 
 
 class FranceEmploiApiCaller:
@@ -94,17 +107,27 @@ class DepartmentJobsCaller:
         in the header of HTTP response for GET request as
         'Content-Range': 'offres 0-149/3430', value is after /
         """
-
         to_parse = header["Content-Range"]
         number_of_jobs = to_parse.split('/')[1]
         return int(number_of_jobs)
+
+    def __store_value(self, result: list, key: str):
+        try:
+            return result[key]
+        except KeyError:
+            return None
 
     def __store_json(self, json_data, f):
         """
         Store json_data into the file self.json_file_path
         TODO : save only attributes needed
         """
-        json.dump(json_data, f)
+        for res in json_data:
+            cleaned_data = {}
+            for (j_key, france_travail_key) in JSON_KEY.items():
+                cleaned_data[j_key] = self.__store_value(
+                    res, france_travail_key)
+            json.dump(cleaned_data, f)
 
     def get_jobs_by_department(self):
         """
@@ -113,6 +136,7 @@ class DepartmentJobsCaller:
 
         json_file = open(self.json_file_path, "w")
         total = 150
+        json_response = ""
 
         # tant qu'on n'a pas reçu tous les jobs
         while self.range_max < (min(total, 3000)):
@@ -127,19 +151,16 @@ class DepartmentJobsCaller:
                 json_file.close()
                 sys.exit(1)
 
-            # print(f"range_max = {self.range_max}")
-            # print(f"total = {total}")
             total = self.__retrieve_number_of_jobs(response.headers) - 1
-
             json_response = json.loads(response.text)
-
             self.__store_json(json_response["resultats"], json_file)
-
             self.range_min = self.range_max + 1
             self.range_max = min(self.range_max+150, total)
+
+        self.criteras.pop("range")
         metadata = {"request": self.criteras,
                     "date": self.dt_string}
-        json.dump(metadata, json_file)
+        json.dump({"metadata": metadata}, json_file)
         json_file.close()
 
 
