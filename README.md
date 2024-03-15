@@ -13,6 +13,10 @@ Le sujet détaillé se retrouve [ici](https://docs.google.com/document/d/1qnaWpb
 
 ## Utilisation
 ```bash
+export FRANCE_EMPLOI_CLIENT_ID={VALEUR}
+export FRANCE_EMPLOI_CLIENT_SECRET={VALEUR}
+export MUSE_CLIENT_SECRET={VALEUR}
+
 python3 sample/__main__.py
 ```
 
