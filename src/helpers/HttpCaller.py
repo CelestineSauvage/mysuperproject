@@ -7,13 +7,14 @@ class HttpCaller:
         pass
 
     @staticmethod
-    def get(url: str, headers: dict = {}, params: dict = {}, cookies: dict = {}) -> requests.Response:
+    def get(url: str, headers: dict = {}, params: dict = {}, body: dict = {}, cookies: dict = {}) -> requests.Response:
         ### Static function to execute a GET query with OAuth2 authentication
         
         # Get the results    
         response = requests.get(
             url,
             headers = headers,
+            data = body,
             params = params,
             cookies= cookies
         )
