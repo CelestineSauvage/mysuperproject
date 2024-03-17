@@ -1,7 +1,7 @@
 import yaml
 from pathlib import Path
-from FranceEmploi.FranceEmploiApiCaller \
-    import FranceEmploiApiCaller, DepartmentJobsCaller
+from apiDataCollection.apiCallers.FranceEmploiApiCaller import \
+    FranceEmploiApiCaller, DepartmentJobsCaller
 
 
 # Load credentials of API providers
