@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 FRANCE_TRAVAIL_FILE_NAME = "FRANCE_TRAVAIL_API"
-JSON_KEY = {
+JSON_KEYS = {  # (key,value) : (our keys, france_travail keys)
     "technical_id": "id",
     "place": "lieuTravail",
     "publication_date": "dateCreation",
@@ -36,6 +36,12 @@ class FranceEmploiApiCaller:
         self.access_token = ""
 
     def authenticate(self, scope: str, params: dict = {}):
+        """_summary_
+
+        Args:
+            scope (str): _description_
+            params (dict, optional): _description_. Defaults to {}.
+        """
         # Function to get an access token via OAuth2 Grant Type
         # Documentation here :
         # - https://francetravail.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
@@ -45,6 +51,17 @@ class FranceEmploiApiCaller:
         )
 
     def get_jobs_by_criterias(self, criteres: dict = {}) -> dict:
+        """_summary_
+
+        Args:
+            criteres (dict, optional): _description_. Defaults to {}.
+
+        Raises:
+            UnauthorizedException: _description_
+
+        Returns:
+            dict: _description_
+        """
         # Function to get jobs list by criterias
         # Documentation here :
         # - https://francetravail.io/data/api/offres-emploi?tabgroup-api=documentation
@@ -124,7 +141,7 @@ class DepartmentJobsCaller:
         """
         for res in json_data:
             cleaned_data = {}
-            for (j_key, france_travail_key) in JSON_KEY.items():
+            for (j_key, france_travail_key) in JSON_KEYS.items():
                 cleaned_data[j_key] = self.__store_value(
                     res, france_travail_key)
             json.dump(cleaned_data, f)
