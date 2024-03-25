@@ -7,9 +7,9 @@ from pathlib import Path
 
 class AdzunaApiCaller:
     
-    def __init__(self, client_id: str, client_secret: str):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, api_id: str, api_key: str):
+        self.api_id = api_id
+        self.api_key = api_key
         self.jobs_search_url = f'https://api.adzuna.com/v1/api/jobs'
 
 
@@ -21,12 +21,12 @@ class AdzunaApiCaller:
         
         url = f'{self.jobs_search_url}/{country}/search/{page}'
 
-        criteres['app_id'] = self.client_id
-        criteres['app_key'] = self.client_secret
+        criteres['app_id'] = self.api_id
+        criteres['app_key'] = self.api_key
 
         response = HttpCaller.get(url=url, headers=headers, params=criteres)
 
         if (response.status_code == 401 or response.status_code == 400): # if Unauthorized response, raise exception
             raise UnauthorizedException(response.message)
         
-        return response
+        return json.loads(response.text)

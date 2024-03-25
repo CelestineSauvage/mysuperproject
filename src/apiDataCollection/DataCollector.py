@@ -1,6 +1,7 @@
 from apiDataCollection.apiCallers.FranceEmploiApiCaller import FranceEmploiApiCaller
 from apiDataCollection.apiCallers.MuseApiCaller import MuseApiCaller
 from apiDataCollection.apiCallers.AdzunaApiCaller import AdzunaApiCaller
+from apiDataCollection.scraper.ApecScraper import ApecScraper
 import requests
 import pandas as pd
 import os
@@ -9,50 +10,58 @@ import os
 class DataCollector:
     # Class for collecting the data from their sources
 
+    france_emploi_client_id = ""
+    france_emploi_client_secret = ""
+    muse_client_secret = ""
+    adzuna_api_id = ""
+    adzuna_api_key = ""
+    
     def __init__(self):
         pass
+
+    @staticmethod
+    def collectCredentialFromEnvVars():
+        DataCollector.france_emploi_client_id = os.environ.get("FRANCE_EMPLOI_CLIENT_ID", "")
+        DataCollector.france_emploi_client_secret = os.environ.get(
+            "FRANCE_EMPLOI_CLIENT_SECRET", "")
+        DataCollector.muse_client_secret = os.environ.get("MUSE_CLIENT_SECRET", "")
+        DataCollector.adzuna_api_id = os.environ.get("ADZUNA_API_ID", "")
+        DataCollector.adzuna_api_key = os.environ.get("ADZUNA_API_KEY", "")
+
+        if DataCollector.france_emploi_client_id == "":
+            raise CredentialNotFoundException(
+                "FRANCE_EMPLOI_CLIENT_ID environment variable not found")
+        if DataCollector.france_emploi_client_secret == "":
+            raise CredentialNotFoundException(
+                "FRANCE_EMPLOI_CLIENT_SECRET environment variable not found")
+        if DataCollector.muse_client_secret == "":
+            raise CredentialNotFoundException(
+                "MUSE_CLIENT_SECRET environment variable not found")
+        if DataCollector.adzuna_api_id == "":
+            raise CredentialNotFoundException("ADZUNA_API_ID environment variable not found")
+        if DataCollector.adzuna_api_key == "":
+            raise CredentialNotFoundException("ADZUNA_API_KEY environment variable not found")
 
     @staticmethod
     def collect():
         print("Start of the step data collection")
 
-        france_emploi_client_id = os.environ.get("FRANCE_EMPLOI_CLIENT_ID", "")
-        france_emploi_client_secret = os.environ.get(
-            "FRANCE_EMPLOI_CLIENT_SECRET", "")
-        muse_client_secret = os.environ.get("MUSE_CLIENT_SECRET", "")
-        adzuna_client_id = os.environ.get("ADZUNA_API_ID", "")
-        adzuna_client_secret = os.environ.get("ADZUNA_API_SECRET", "")
-
-        if france_emploi_client_id == "":
-            raise CredentialNotFoundException(
-                "france_emploi_client_id environment variable not found")
-        if france_emploi_client_secret == "":
-            raise CredentialNotFoundException(
-                "france_emploi_client_secret environment variable not found")
-        if muse_client_secret == "":
-            raise CredentialNotFoundException(
-                "muse_client_secret environment variable not found")
-        if adzuna_client_id == "":
-            raise CredentialNotFoundException("adzuna_client_id environment variable not found")
-        if adzuna_client_secret == "":
-            raise CredentialNotFoundException("adzuna_client_secret environment variable not found")
-
-        print("Start of the step data collection")
-
-    
-        DataCollector.__collectFromFranceEmploi(france_emploi_client_id, france_emploi_client_secret)
-        DataCollector.__collectFromMuse(muse_client_secret)
-        DataCollector.__collectFromAdzuna(adzuna_client_id, adzuna_client_secret)
+        #DataCollector.__collectFromFranceEmploi()
+        #DataCollector.__collectFromMuse()
+        #DataCollector.__collectFromAdzuna()
+        DataCollector.__collectFromApec()
+        
+        print("End of the step data collection")
         
     @staticmethod
-    def __collectFromFranceEmploi(client_id: str, client_secret: str):
+    def __collectFromFranceEmploi():
         print("Start of data collection for France Emploi")
         # Initialize the France Emploi API caller
-        franceEmploi = FranceEmploiApiCaller(client_id, client_secret)
+        franceEmploi = FranceEmploiApiCaller(DataCollector.france_emploi_client_id, \
+            DataCollector.france_emploi_client_secret)
 
         # Authenticate to the France Emploi API services
-        franceEmploi.authenticate("api_offresdemploiv2 o2dsoffre", {
-                                  "realm": "/partenaire"})
+        franceEmploi.authenticate("api_offresdemploiv2 o2dsoffre", {"realm": "/partenaire"})
 
         # Gets the jobs list with the criteria (=filter) on 'departement' with value '30'
         franceEmploiJobs = franceEmploi.get_jobs_by_criterias(
@@ -65,11 +74,11 @@ class DataCollector:
         print("End of data collection for France Emploi")
 
     @staticmethod
-    def __collectFromMuse(client_secret: str):
+    def __collectFromMuse():
         print("Start of data collection for Muse")
 
         # Initialize the Muse API caller
-        muse = MuseApiCaller(client_secret)
+        muse = MuseApiCaller(DataCollector.muse_client_secret)
 
         # Gets the jobs list with the criteria (=filter)
         list_all_jobs_parsed = list()
@@ -82,9 +91,9 @@ class DataCollector:
         print("End of data collection for Muse")
 
     @staticmethod
-    def __collectFromAdzuna(client_id: str, client_secret: str):
-        
-        Adzuna = AdzunaApiCaller(client_id, client_secret)
+    def __collectFromAdzuna():
+        Adzuna = AdzunaApiCaller(DataCollector.adzuna_api_id, \
+            DataCollector.adzuna_api_key)
         
         country = 'fr'
         page = 1
@@ -95,7 +104,7 @@ class DataCollector:
         }
 
         adzuna_jobs = Adzuna.get_jobs_by_criterias(country=country, page=page, criteres=critere)
-
+        print(adzuna_jobs)
         #    suite job
         # r = requests.get(f'https://api.adzuna.com/v1/api/jobs/fr/search/1', params=query)
         # response = r.json()
@@ -138,5 +147,27 @@ class DataCollector:
         #     'max_days_old': '1',
         # }
  
+    @staticmethod
+    def __collectFromApec():
+        print("Start of data collection for Apec")
+
+        # Initialize the Apec scraper
+        apec = ApecScraper()
+
+        # Gets the jobs list with the criteria (=filter)
+        all_jobs_parsed = dict()
+        for p in range(1, 300):
+            print("Scraping of the page " + str(p))
+            params = {"page": p, "descending": "true", "lieux": "799", "sortsType": "DATE"}
+            jobs_parsed_list = apec.get_jobs_by_criterias(params)
+            #print(jobs_parsed_list)
+            # TODO Trouver comment ajouter le contenu du dict 'jobs_parsed_list' dans le dict 'all_jobs_parsed'
+            # dict(all_jobs_parsed.items() | jobs_parsed_list.items())
+
+        apec.close_scraper()
+        
+        #print(all_jobs_parsed)
+        print("End of data collection for Apec")
+        
 class CredentialNotFoundException(Exception):
     pass

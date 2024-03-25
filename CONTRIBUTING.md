@@ -35,6 +35,18 @@ Install automatically all the required packages according to the configuration f
 pip3 install -r requirements.txt
 ```
 
+## Install Chrome web browser needed for the Selenium package
+
+Install :
+```shell script
+sudo apt install google-chrome-stable
+```
+
+Check it's installed :
+```shell script
+google-chrome --version
+```
+
 ## Create a new branch to work on your contribution
 
 ```shell script

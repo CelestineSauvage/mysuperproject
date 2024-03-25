@@ -128,8 +128,7 @@ class DepartmentJobsCaller:
         """
         now = datetime.datetime.now()
         self.dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{
-            department}_{self.dt_string}"
+        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{department}_{self.dt_string}"
         return file_name
 
     def __retrieve_number_of_jobs(self, header: dict) -> int:
@@ -191,8 +190,7 @@ class DepartmentJobsCaller:
         while self.range_max < (min(total, 3000)):
 
             # update new range of jobs to download
-            self.criteras["range"] = f"{
-                str(self.range_min)}-{str(self.range_max)}"
+            self.criteras["range"] = f"{str(self.range_min)}-{str(self.range_max)}"
 
             try:  # If exception raise, close the file and quit the program
                 response = self.FranceEmploiApiCaller.get_jobs_by_criterias(
