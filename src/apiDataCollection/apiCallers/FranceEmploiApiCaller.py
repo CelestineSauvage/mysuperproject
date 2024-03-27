@@ -4,23 +4,17 @@ import json
 import datetime
 import sys
 from pathlib import Path
+from apiDataCollection.APIConstants import FTConstants
 
-FRANCE_TRAVAIL_FILE_NAME = "FRANCE_TRAVAIL_API"
-ACCEPTED_CRITERAS = [
-    "departement, publieeDepuis, maxCreationDate, minCreationData"]
-JSON_KEYS = {  # (key,value) : (our keys, france_travail keys)
-    "technical_id": "id",
-    "place": "lieuTravail",
-    "publication_date": "dateCreation",
-    "actualisation_date": "dateActualisation",
-    "rome_libelle": "romeLibelle",
-    "appellation_libelle": "appellationlibelle",
-    "contrat_type": "typeContrat",
-    "experience": "experienceLibelle",
-    "salary": "salaire",
-    "sector": "secteurActiviteLibelle",
-    "qualification": "qualificationLibelle"
-}
+import logging
+logger = logging.getLogger(__name__)
+
+
+FRANCE_TRAVAIL_FILE_NAME = FTConstants.FRANCE_TRAVAIL_FILE_NAME.value
+
+ACCEPTED_CRITERAS = FTConstants.ACCEPTED_CRITERAS.value
+
+JSON_KEYS = FTConstants.JSON_KEYS.value
 
 
 class FranceEmploiApiCaller:
@@ -108,7 +102,8 @@ class DepartmentJobsCaller:
             maxCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z'
             minCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z')
         """
-        assert (key in ACCEPTED_CRITERAS for key in optionnals.keys())
+        assert (
+            key in ACCEPTED_CRITERAS for key in optionnals.keys())
         self.FranceEmploiApiCaller = FranceEmploiApiCaller
         self.criteras = optionnals
         self.range_min = 0
@@ -128,7 +123,8 @@ class DepartmentJobsCaller:
         """
         now = datetime.datetime.now()
         self.dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{department}_{self.dt_string}"
+        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{
+            department}_{self.dt_string}"
         return file_name
 
     def __retrieve_number_of_jobs(self, header: dict) -> int:
@@ -148,7 +144,7 @@ class DepartmentJobsCaller:
 
     def __store_value(self, result: dict, key: str):
         """Store value of the result["key"] if exist, else store None
-
+        #TODO : don't store None
         Args:
             result (dict): job in json format
             key (str): key
@@ -190,7 +186,8 @@ class DepartmentJobsCaller:
         while self.range_max < (min(total, 3000)):
 
             # update new range of jobs to download
-            self.criteras["range"] = f"{str(self.range_min)}-{str(self.range_max)}"
+            self.criteras["range"] = f"{
+                str(self.range_min)}-{str(self.range_max)}"
 
             try:  # If exception raise, close the file and quit the program
                 response = self.FranceEmploiApiCaller.get_jobs_by_criterias(

@@ -1,0 +1,88 @@
+  {
+      "id": "171PLHF",
+      "intitule": "Employé des collectivités H/F",
+      "description": "Nous recherchons une personne pour réaliser l'entretien des locaux dans un établissement d'accueil d'urgence de demandeurs d'asile. \n\nVos missions : \nEntretien du site :  effectuer le ménage et veiller à l'entretien du site. Nettoyage et entretien des parties communes. Nettoyage des chambres et studios au départ des résidents. S'assurer de la propreté des logements qui vont être attribués, y effectuer le ménage de manière à ce que le lieu soit propre à l'arrivée des nouveaux résidents si nécessaire. Gestion de la lingerie (commande, rangement, distribution)\nLe lien avec l'équipe pluridisciplinaire est primordial.\n\nConnaissances et qualités requises :\nDynamisme, rigueur dans le respect du cadre institutionnel, adaptabilité, bienveillance et motivation doivent être votre moteur au quotidien.\n\nCDD de 2 mois avec possibilité de renouvellement.\nLe poste est à pourvoir dès que possible.",
+      "dateCreation": "2024-03-22T10:22:21.000Z",
+      "dateActualisation": "2024-03-22T10:22:21.000Z",
+      "lieuTravail": {
+        "libelle": "01 - CULOZ",
+        "latitude": 45.849734,
+        "longitude": 5.773418,
+        "codePostal": "01350",
+        "commune": "01138"
+      },
+      "romeCode": "I1203",
+      "romeLibelle": "Maintenance des bâtiments et des locaux",
+      "appellationlibelle": "Agent / Agente d'entretien des collectivités",
+      "entreprise": {
+        "nom": "ALFA 3A",
+        "entrepriseAdaptee": false
+      },
+      "typeContrat": "CDD",
+      "typeContratLibelle": "Contrat à durée déterminée - 1 Mois",
+      "natureContrat": "Contrat travail",
+      "experienceExige": "D",
+      "experienceLibelle": "Débutant accepté",
+      "competences": [
+        {
+          "code": "300227",
+          "libelle": "Peindre des surfaces et supports visuels",
+          "exigence": "S"
+        },
+        {
+          "code": "106659",
+          "libelle": "Diagnostiquer une panne sur une installation (éclairage, chauffage, sanitaires)",
+          "exigence": "S"
+        },
+        {
+          "code": "106661",
+          "libelle": "Réparer ou remplacer les poignées, vitres, rails, ... de portes, fenêtres, ...",
+          "exigence": "S"
+        },
+        {
+          "code": "106811",
+          "libelle": "Contrôler une installation électrique",
+          "exigence": "S"
+        }
+      ],
+      "salaire": {
+        "libelle": "Mensuel de 1766,92 Euros sur 12 mois"
+      },
+      "dureeTravailLibelle": "35H Travail en journée",
+      "dureeTravailLibelleConverti": "Temps plein",
+      "alternance": false,
+      "contact": {
+        "nom": "Pôle Emploi BELLEY",
+        "coordonnees1": "ZI Ecassaz 62 RUE JUVANON DU VACHAT",
+        "coordonnees2": "01300 BELLEY",
+        "coordonnees3": "Pour postuler, utiliser le lien suivant : https://candidat.pole-emploi.fr/offres/recherche/detail/171PLHF"
+      },
+      "agence": {
+        "courriel": "Pour postuler, utiliser le lien suivant : https://candidat.pole-emploi.fr/offres/recherche/detail/171PLHF"
+      },
+      "nombrePostes": 1,
+      "accessibleTH": false,
+      "qualificationCode": "6",
+      "qualificationLibelle": "Employé qualifié",
+      "codeNAF": "88.99B",
+      "secteurActivite": "88",
+      "secteurActiviteLibelle": "Action sociale sans hébergement n.c.a.",
+      "qualitesProfessionnelles": [
+        {
+          "libelle": "Faire preuve d'autonomie",
+          "description": "Capacité à prendre en charge son activité sans devoir être encadré de façon continue (le cas échéant, à solliciter les autres acteurs de l'entreprise)."
+        },
+        {
+          "libelle": "Organiser son travail selon les priorités et les objectifs",
+          "description": "Capacité à planifier, prioriser, anticiper des actions, en tenant compte des moyens, des ressources, des objectifs et du calendrier pour les réaliser."
+        },
+        {
+          "libelle": "Travailler en équipe",
+          "description": "Capacité à travailler et à se coordonner avec les autres au sein de l'entreprise pour réaliser les objectifs fixés."
+        }
+      ],
+      "origineOffre": {
+        "origine": "1",
+        "urlOrigine": "https://candidat.pole-emploi.fr/offres/recherche/detail/171PLHF"
+      }
+    }
