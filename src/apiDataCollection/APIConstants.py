@@ -81,3 +81,10 @@ class FTConstants(Enum):
         ]
 
     }
+
+class ApecConstants(Enum):
+
+    APEC_FILE_NAME = "APEC_SCRAPING"
+
+    ACCEPTED_CRITERAS = [
+        "page", "descending", "lieux", "sortsType", "anciennetePublication", "typesContrat"]

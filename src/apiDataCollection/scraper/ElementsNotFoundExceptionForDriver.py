@@ -1,0 +1,2 @@
+class ElementsNotFoundExceptionForDriver(Exception):
+    pass

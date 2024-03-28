@@ -1,0 +1,2 @@
+class ElementsNotFoundExceptionForDivsOffer(Exception):
+    pass

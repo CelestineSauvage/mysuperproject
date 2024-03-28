@@ -1,4 +1,4 @@
-import src.apiDataCollection.jobsProcess as jP
+import src.apiDataCollection.JobsProcess as jP
 import pytest
 
 

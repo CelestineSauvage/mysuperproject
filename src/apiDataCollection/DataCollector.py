@@ -2,10 +2,8 @@ from apiDataCollection.apiCallers.FranceEmploiApiCaller import FranceEmploiApiCa
 from apiDataCollection.apiCallers.MuseApiCaller import MuseApiCaller
 from apiDataCollection.apiCallers.AdzunaApiCaller import AdzunaApiCaller
 from apiDataCollection.scraper.ApecScraper import ApecScraper
-import requests
-import pandas as pd
+from helpers.Chronometer import Chronometer
 import os
-
 
 class DataCollector:
     # Class for collecting the data from their sources
@@ -15,6 +13,7 @@ class DataCollector:
     muse_client_secret = ""
     adzuna_api_id = ""
     adzuna_api_key = ""
+    chrono = Chronometer()
     
     def __init__(self):
         pass
@@ -146,27 +145,22 @@ class DataCollector:
         #     'sort_by': 'date',
         #     'max_days_old': '1',
         # }
- 
+
     @staticmethod
+    @chrono.timeit
     def __collectFromApec():
         print("Start of data collection for Apec")
 
         # Initialize the Apec scraper
-        apec = ApecScraper()
+        apecScraper = ApecScraper()
 
         # Gets the jobs list with the criteria (=filter)
-        all_jobs_parsed = dict()
-        for p in range(1, 300):
-            print("Scraping of the page " + str(p))
-            params = {"page": p, "descending": "true", "lieux": "799", "sortsType": "DATE"}
-            jobs_parsed_list = apec.get_jobs_by_criterias(params)
-            #print(jobs_parsed_list)
-            # TODO Trouver comment ajouter le contenu du dict 'jobs_parsed_list' dans le dict 'all_jobs_parsed'
-            # dict(all_jobs_parsed.items() | jobs_parsed_list.items())
+        params = {"descending": "true", "sortsType": "DATE"}
+        apecScraper.get_jobs_by_criterias(params)
 
-        apec.close_scraper()
+        # Close the Apec scraper
+        apecScraper.close_scraper()
         
-        #print(all_jobs_parsed)
         print("End of data collection for Apec")
         
 class CredentialNotFoundException(Exception):
