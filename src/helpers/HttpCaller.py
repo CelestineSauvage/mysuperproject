@@ -1,4 +1,6 @@
 import requests
+import logging
+logger = logging.getLogger(__name__)
 
 
 class HttpCaller:
@@ -39,8 +41,8 @@ class HttpCaller:
 
     @classmethod
     def __print_status_code(self, url: str, verb: str, response: requests.Response):
-        print("Status Code for HTTP", verb, "on",
-              url, ':', response.status_code)
+        logger.info(f"Status Code for HTTP {verb} on "
+                    f"{url} : {response.status_code}")
 
 
 class UnauthorizedException(Exception):

@@ -1,6 +1,20 @@
 from enum import Enum
 
 
+class DataCollectorConstants(Enum):
+
+    # Name of arguments for argparse
+    ARG_DATE_MIN = "minCreationDate"
+    ARG_DATE_MAX = "maxCreationDate"
+    ARG_PUBLISHED_SINCE = "publieeDepuis"
+    ARG_DEPARTMENTS = "department"
+    ARG_PATH = "path"
+
+    # Env variables
+    FT_CLIENT_ID = "FRANCE_EMPLOI_CLIENT_ID"
+    FT_CLIENT_SECRET = "FRANCE_EMPLOI_CLIENT_SECRET"
+
+
 class FTConstants(Enum):
 
     FRANCE_TRAVAIL_FILE_NAME = "FRANCE_TRAVAIL_API"
@@ -13,7 +27,7 @@ class FTConstants(Enum):
         "place": "lieuTravail",
         "publication_date": "dateCreation",
         "actualisation_date": "dateActualisation",
-        "sector": "romeLibelle",
+        "category": "romeLibelle",
         "title": "intitule",
         "contrat_type": "typeContrat",
         "experience": "experienceLibelle",
@@ -81,6 +95,7 @@ class FTConstants(Enum):
         ]
 
     }
+
 
 class ApecConstants(Enum):
 
