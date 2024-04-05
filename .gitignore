@@ -1,7 +1,8 @@
 .env
 __pycache__/
 **/.vscode/
-
+data/
+ 
 # DOWNLOAD FILES
 downloads/
 
@@ -12,3 +13,4 @@ downloads/
 # IPython
 profile_default/
 ipython_config.py
+

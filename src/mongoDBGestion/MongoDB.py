@@ -1,6 +1,9 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, CollectionInvalid
+from datetime import datetime, timezone
 import sys
+from pathlib import Path
+import json
 
 class NoSchemasValidation(Exception):
     pass
@@ -104,112 +107,146 @@ class Mongodb:
         except Exception as e:
             sys.exit(e)
 
-jobs_schema_validator = {
-        "$jsonSchema": {
-            "bsonType": "object",
-            "required": ["title", "source", "publication_date", "technical_id"],
-            "properties": {
-                "title": {
-                    "bsonType": "string",
-                    "description": "must be a string and is required"
-                },
-                "technical_id": {
-                    "bsonType": "string",
-                    "description":  "must be a string and is required"
-                },
-                "publication_date": {
-                    "bsonType": "date",
-                    "description": "must be a date and is required"
-                },
-                "source": {
-                    "bsonType": "int",
-                    "enum": [0, 1],
-                    "description": "can only be one of the enum values and is required"
+    @staticmethod
+    def process_file_for_db_insertion(file, collection_name):
+
+        # log.debug('process_file_for_db_insertion')
+        jobs_list = Mongodb.get_jobs_from_file(file)
+        Mongodb.insert_jobs_into_db(jobs_list, collection_name)
+
+    @staticmethod
+    def get_jobs_from_file(file):
+        # log.debug('get_jobs_from_file')
+        content_file_str = file.read_text()
+        content_file_json = json.loads(content_file_str)
+
+        return content_file_json
+
+    @staticmethod
+    def insert_jobs_into_db(jobs, collection_name):
+        # log.debug('insert_jobs_into_db')
+        for job in jobs:
+            
+            job = Mongodb.parse_and_clean_job(job)
+            
+            toto = Mongodb.insert_job(job, collection_name)
+        
+        return
+
+    @staticmethod
+    def parse_and_clean_job(job):
+        # log.debug('parse_and_clean_job')
+        # convert str to datetime
+        try:
+            job['contents']['publication_date'] = datetime.fromisoformat(job['contents']['publication_date'])
+            job['contents']['actualisation_date'] = datetime.fromisoformat(job['contents']['actualisation_date'])
+        except:
+            pass
+
+        #add _id
+        job['_id'] = str(job['technical_id']) + "_" + str(job['source'])
+        
+        # add inserteed_date
+        job['inserted_date'] = datetime.now(timezone.utc)
+            
+        return job
+
+    @staticmethod
+    def insert_job(job, collection_name):
+        # log.debug('insert_job')
+        toto = collection_name.update_one({'_id': job['_id']}, {'$set': job}, upsert=True)
+        
+        return toto
+
+
+def database_check():
+    print('database_check')
+    jobs_schema_validator = {
+            "$jsonSchema": {
+                "bsonType": "object",
+                "required": ["technical_id", "inserted_date", "source", "contents"],
+                "properties": {
+                    "technical_id": {
+                        "bsonType": "string",
+                        "description":  "must be a string and is required"
+                    },
+                    "inserted_date": {
+                        "bsonType": "date",
+                        "description": "must be the date of database insertion"
+                    },
+                    "source": {
+                        "bsonType": "int",
+                        "enum": [0, 1],
+                        "description": "can only be one of the enum values and is required"
+                    },
+                    "contents": {
+                        "bsonType": "object",
+                        "description": "nested document with 2 required element: title and publication_date",
+                        "required": ["title", "publication_date"],
+                        "properties": {
+                            "title": {
+                                "bsonType": "string",
+                                "description": "must be a string and is required"
+                            },
+                            "publication_date": {
+                                "bsonType": "date",
+                                "description": "must be the date of database insertion"
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
 
+    client = Mongodb("admin", "pass")
+    db_name = 'test'
+    collection_name = 'collection_job_test_with_shema_validation'
 
-client = Mongodb("admin", "pass")
-db_name = 'test'
-collection_name = 'collection_job_test_with_shema_validation'
+    db = client.create_or_connect_database(db_name)
+    if collection_name in db.list_collection_names():
+        jobs_collection = db[collection_name]
+    else:
+        jobs_collection = client.create_collection(db, collection_name, jobs_schema_validator)
+    
+    return None
 
-db = client.create_or_connect_database(db_name)
-if collection_name in db.list_collection_names():
+def insert_new_data_into_db():
+    print('insert_new_date_into_db')
+    client = Mongodb("admin", "pass")
+    db_name = 'test'
+    collection_name = 'collection_job_test_with_shema_validation'
+
+    db = client.create_or_connect_database(db_name)
     jobs_collection = db[collection_name]
-else:
-    jobs_collection = client.create_collection(db, collection_name, jobs_schema_validator)
+    
+    current_dir = Path.cwd()
+    files_path_to_process = [p for p in current_dir.glob('data/data_to_insert/*.json') if p.is_file()]
 
-collection_without = client.create_collection(db, "collection_job_test_without_shema_validation")
-
-from datetime import datetime
-
-doc = [{
-    "_id":100,
-    "title": "id_1_new",
-    "technical_id": "new_test", 
-    "publication_date": datetime(1990, 1, 3),
-    "source": 1
-    }, {
-    "_id":101,
-    "title": "id_22_new",
-    "technical_id": "BBBBB", 
-    "publication_date": datetime(1990, 1, 3),
-    "source": "1"
-    }, {
-    "_id":102,
-    "title": "id_22_new",
-    "technical_id": "BBBBB", 
-    "publication_date": datetime(1990, 1, 3),
-    "source": 1
-    }
-    ]
-
-doc1={
-    "_id":10000,
-    "title": "newwwwwwww",
-    "technical_id": "newwwwww", 
-    "publication_date": datetime(1990, 1, 10),
-    "source": 0,
-    "content":{'toto':'titi'}
-    }
-try:
-    # insert manu document
-    client.insert_data_into_collection(jobs_collection, doc1)
-    # upsert 
-    #  et si les colonnes 
-    from time import time
-start_time= time()
-for i in range(1,100000,1):
-    doc1={
-        "_id":"2_u",
-        "title": "2",
-        "technical_id": "gfkjgfjkgjfkjk", 
-        "publication_date": datetime(1990, 1, 31),
-        "source": 0,
-        }
-
-    jobs_collection.update_one({ '_id' : '2_u'}, { '$set': doc1 }, {'$unset':{}}, upsert=True)
-    jobs_collection.replace_one({ '_id' : '2_u'}, { 'replacement': doc1 }, upsert=True)
-print('end')
-stop_time=time()
+    for file_path in files_path_to_process[0:10]:
+        print(f"File under process: {file_path}")
+        Mongodb.process_file_for_db_insertion(file_path, jobs_collection)
+        print(f"File processed")
 
 
-# create_jobs_collection()
-# # technical_id: int id dans la source   / obligatoire 
-# # title: str intitule string  // obligatoire
-# # source = int 0 : FT ou 1 : APEC
-# # publication_date: format DateTime "2024-03-22T10:22:21.000Z",
-# # actualisation_date: format DateTime ou None,
-# # sector: enum tag ou None
-# # contract_type: int 0 : CDD , 1 : CDI  (a voir ) ou None
-# # contract_time : int 0 : temps plein , 1 : temps partiel ou None
-# # experience: char ou None
-# # salary: str ou None
-# # description : str
-# # competences : list str ou None
-# # company : str ou None
-# # place : 
-# #  commune : str
-# #  département : int
+
+def question_data():
+    print('question_data')
+    # start_date = datetime(2024, 4, 4, 0, 0, 0, 0)
+    # jobs.count_documents({})
+    # len(list(jobs.find({"source" :0})))
+    # list(
+    #     jobs.find({
+    #         'contents.publication_date' : {'$gte':start_date}
+    #     })
+    # )
+
+
+    # jobs.find({"$source" :0})
+
+
+    # # get taille of jos ccollection
+    # print()
+
+
+if __name__ == "__main__":
+    main()
