@@ -1,2 +1,0 @@
-class TimeoutExceptionForDriverElements(Exception):
-    pass

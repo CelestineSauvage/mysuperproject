@@ -1,2 +1,0 @@
-class ElementsNotFoundExceptionForDriver(Exception):
-    pass

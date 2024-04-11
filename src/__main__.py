@@ -1,4 +1,4 @@
 from apiDataCollection.DataCollector import DataCollector
 
-DataCollector.collectCredentialFromEnvVars()
+#DataCollector.collectCredentialFromEnvVars()
 DataCollector.collect()

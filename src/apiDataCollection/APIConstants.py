@@ -103,3 +103,10 @@ class ApecConstants(Enum):
 
     ACCEPTED_CRITERAS = [
         "page", "descending", "lieux", "sortsType", "anciennetePublication", "typesContrat"]
+    
+    ANCIENNETE_PUBLICATION = { # (key,value) : (our keys, APEC keys)
+        "jour": "101850",
+        "semaine": "101851",
+        "mois": "101852",
+        "tout": "101853"
+    }

@@ -3,6 +3,7 @@ import logging
 import argparse
 from apiDataCollection.APIConstants import DataCollectorConstants
 from apiDataCollection import DataCollector
+from helpers.Chronometer import Chronometer
 
 ARG_DATE_MIN = DataCollectorConstants.ARG_DATE_MIN.value
 ARG_DATE_MAX = DataCollectorConstants.ARG_DATE_MAX.value
@@ -34,13 +35,18 @@ def parse_args():
 
 
 def main():
+    chrono = Chronometer()
+    
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(format=log_format, level=logging.DEBUG)
+    logging.basicConfig(format=log_format, level=logging.INFO)
 
     args = parse_args()
 
-    FTDataCollector = DataCollector.FTDataCollector()
-    FTDataCollector.download(args)
+    #FTDataCollector = DataCollector.FTDataCollector()
+    #FTDataCollector.collect(args)
+
+    apecDataCollector = DataCollector.ApecDataCollector()
+    apecDataCollector.collect(args)
 
 
 if __name__ == "__main__":

@@ -5,15 +5,15 @@ from pathlib import Path
 from datetime import datetime
 from apiDataCollection.apiCallers.FranceEmploiApiCaller import \
     FranceEmploiApiCaller, DepartmentJobsCaller
-from apiDataCollection.apiCallers.MuseApiCaller import MuseApiCaller
-from apiDataCollection.apiCallers.AdzunaApiCaller import AdzunaApiCaller
 from apiDataCollection.scraper.ApecScraper import ApecScraper
-from apiDataCollection.APIConstants import DataCollectorConstants
+from apiDataCollection.APIConstants import DataCollectorConstants, ApecConstants, FTConstants
 from helpers.Chronometer import Chronometer
 from apiDataCollection import JobsProcess
 
 import logging
 logger = logging.getLogger(__name__)
+chrono = Chronometer()
+ARG_PATH = DataCollectorConstants.ARG_PATH.value
 
 
 class FTDataCollector:
@@ -25,12 +25,13 @@ class FTDataCollector:
     ARG_DATE_MAX = DataCollectorConstants.ARG_DATE_MAX.value
     ARG_PUBLISHED_SINCE = DataCollectorConstants.ARG_PUBLISHED_SINCE.value
     ARG_DEPARTMENTS = DataCollectorConstants.ARG_DEPARTMENTS.value
-    ARG_PATH = DataCollectorConstants.ARG_PATH.value
 
     FT_CLIENT_ID = DataCollectorConstants.FT_CLIENT_ID.value
     FT_CLIENT_SECRET = DataCollectorConstants.FT_CLIENT_SECRET.value
 
-    def _collect_from_france_emploi(self) -> FranceEmploiApiCaller:
+    @staticmethod
+    @chrono.timeit
+    def _collect_from_france_emploi() -> FranceEmploiApiCaller:
         """Collect id and secret for france travail API 
 
         Returns:
@@ -56,7 +57,9 @@ class FTDataCollector:
 
         return franceEmploi
 
-    def _parse_date(self, kwargs: dict) -> dict:
+    @staticmethod
+    @chrono.timeit
+    def _parse_date(kwargs: dict) -> dict:
         """_summary_
 
         Args:
@@ -94,7 +97,9 @@ class FTDataCollector:
         kwargs.update(dates_formated)
         return kwargs
 
-    def _parse_department(self, kwargs: dict) -> list:
+    @staticmethod
+    @chrono.timeit
+    def _parse_department(kwargs: dict) -> list:
         """_summary_
 
         Args:
@@ -117,16 +122,19 @@ class FTDataCollector:
             departments = kwargs[ARG_DEPARTMENTS].split()
         return departments
 
-    def download(self, kwargs: dict):
+    @staticmethod
+    @chrono.timeit
+    def collect(kwargs: dict):
         """_summary_
 
         Args:
             kwargs (dict): _description_
         """
         try:
-            france_emploi = self._collect_from_france_emploi()
+            france_emploi = FTDataCollector._collect_from_france_emploi()
         except CredentialNotFoundException as ex:
             logger.error(ex)
+            exit()
 
         directory = Path(kwargs[ARG_PATH])
         # create directory if doesn't exist
@@ -134,11 +142,11 @@ class FTDataCollector:
         kwargs.pop(ARG_PATH)
 
         # return one or a list of departments
-        departments = self._parse_department(kwargs)
+        departments = FTDataCollector._parse_department(kwargs)
         kwargs.pop(ARG_DEPARTMENTS)
 
         # transform date format TODO : error request
-        kwargs = self._parse_date(kwargs)
+        kwargs = FTDataCollector._parse_date(kwargs)
 
         try:
             for dep in departments:
@@ -156,152 +164,43 @@ class FTDataCollector:
             sys.exit()
 
         transformation = JobsProcess.FTJobsProcess()
-        transformation.process_directory(directory
-                                         )
+        transformation.process_directory(directory)
 
 
-class DataCollector:
-    # Class for collecting the data from their sources
-
-    france_emploi_client_id = ""
-    france_emploi_client_secret = ""
-    muse_client_secret = ""
-    adzuna_api_id = ""
-    adzuna_api_key = ""
-    chrono = Chronometer()
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def collectCredentialFromEnvVars():
-        DataCollector.france_emploi_client_id = os.environ.get(
-            "FRANCE_EMPLOI_CLIENT_ID", "")
-        DataCollector.france_emploi_client_secret = os.environ.get(
-            "FRANCE_EMPLOI_CLIENT_SECRET", "")
-        DataCollector.muse_client_secret = os.environ.get(
-            "MUSE_CLIENT_SECRET", "")
-        DataCollector.adzuna_api_id = os.environ.get("ADZUNA_API_ID", "")
-        DataCollector.adzuna_api_key = os.environ.get("ADZUNA_API_KEY", "")
-
-        if DataCollector.france_emploi_client_id == "":
-            raise CredentialNotFoundException(
-                "FRANCE_EMPLOI_CLIENT_ID environment variable not found")
-        if DataCollector.france_emploi_client_secret == "":
-            raise CredentialNotFoundException(
-                "FRANCE_EMPLOI_CLIENT_SECRET environment variable not found")
-        if DataCollector.muse_client_secret == "":
-            raise CredentialNotFoundException(
-                "MUSE_CLIENT_SECRET environment variable not found")
-        if DataCollector.adzuna_api_id == "":
-            raise CredentialNotFoundException(
-                "ADZUNA_API_ID environment variable not found")
-        if DataCollector.adzuna_api_key == "":
-            raise CredentialNotFoundException(
-                "ADZUNA_API_KEY environment variable not found")
-
-    @staticmethod
-    def collect():
-        print("Start of the step data collection")
-
-        # DataCollector.__collectFromFranceEmploi()
-        # DataCollector.__collectFromMuse()
-        # DataCollector.__collectFromAdzuna()
-        DataCollector.__collectFromApec()
-
-        print("End of the step data collection")
-
-    @staticmethod
-    def __collectFromMuse():
-        print("Start of data collection for Muse")
-
-        # Initialize the Muse API caller
-        muse = MuseApiCaller(DataCollector.muse_client_secret)
-
-        # Gets the jobs list with the criteria (=filter)
-        list_all_jobs_parsed = list()
-        for p in range(10):
-            params = {"page": {p}, "descending": "true"}
-            jobs_page = muse.get_jobs_by_criterias(params)
-            jobs_parsed_list = muse.parse_job_from_page(jobs_page['results'])
-            list_all_jobs_parsed = list_all_jobs_parsed + jobs_parsed_list
-
-        print("End of data collection for Muse")
-
-    @staticmethod
-    def __collectFromAdzuna():
-        Adzuna = AdzunaApiCaller(DataCollector.adzuna_api_id,
-                                 DataCollector.adzuna_api_key)
-
-        country = 'fr'
-        page = 1
-        critere = {
-            'results_per_page': '50',
-            'sort_by': 'date',
-            'max_days_old': '1',
-        }
-
-        adzuna_jobs = Adzuna.get_jobs_by_criterias(
-            country=country, page=page, criteres=critere)
-        print(adzuna_jobs)
-        #    suite job
-        # r = requests.get(f'https://api.adzuna.com/v1/api/jobs/fr/search/1', params=query)
-        # response = r.json()
-        # nb_count = response['count']
-        # nb_page = ceil(nb_count/50)
-
-        # keys_value = set()
-
-        # start_time = time.time()
-        # all_jobs = []
-        # for page in range(1,2000):
-        #     print(page)
-        #     r = requests.get(f'http://api.adzuna.com/v1/api/jobs/fr/search/{page}', params=query)
-        #     response = r.json()
-        #     all_jobs.extend(response['results'])
-
-        #     with open('all_jobs_22mars.json', 'w') as f:
-        #         json.dump(all_jobs, f)
-
-        #     df = pd.DataFrame(all_jobs)
-        #     df.to_csv("all_jobs_22mars.csv")
-
-        # print(len(all_jobs))
-
-        # with open('all_jobs.json', 'w') as f:
-        #     json.dump(all_jobs, f)
-
-        # df = pd.DataFrame(all_jobs)
-        # df.to_csv("all_jobs.csv")
-
-        # print("Start of the step data collection")
-
-        # ['__CLASS__', 'adref', 'category', 'company', 'contract_time', 'contract_type', 'created', 'description', 'id', 'latitude', 'location', 'longitude', 'redirect_url', 'salary_is_predicted', 'salary_max', 'salary_min', 'title']
-
-        # query = {'app_id': adzuna_client_id,
-        #     'app_key': adzuna_client_secret,
-        #     'content-type': 'application/json',
-        #     'results_per_page': '50', # max 50
-        #     'sort_by': 'date',
-        #     'max_days_old': '1',
-        # }
-
+class ApecDataCollector:
+    
     @staticmethod
     @chrono.timeit
-    def __collectFromApec():
+    def collect(kwargs: dict):
         print("Start of data collection for Apec")
 
+        directory = Path(kwargs[ARG_PATH])
+        # create directory if doesn't exist
+        directory.mkdir(parents=True, exist_ok=True)
+        kwargs.pop(ARG_PATH)
+        
+        if kwargs[ARG_PUBLISHED_SINCE] is None:
+            published_since = ApecConstants.ANCIENNETE_PUBLICATION.value['tout']
+        else:
+            published_since = ApecConstants.ANCIENNETE_PUBLICATION.value[kwargs[ARG_PUBLISHED_SINCE]]
+        
         # Initialize the Apec scraper
-        apecScraper = ApecScraper()
+        apecScraper = ApecScraper(directory)
 
         # Gets the jobs list with the criteria (=filter)
-        params = {"descending": "true", "sortsType": "DATE"}
+        params = {"descending": "true", "sortsType": "DATE", "anciennetePublication": published_since}
+        
         apecScraper.get_jobs_by_criterias(params)
 
         # Close the Apec scraper
         apecScraper.close_scraper()
 
         print("End of data collection for Apec")
+        
+        print("Start of data transformation for Apec")
+        transformation = JobsProcess.ApecJobsProcess()
+        transformation.process_directory(directory)
+        print("End of data transformation for Apec")
 
 
 class CredentialNotFoundException(Exception):
