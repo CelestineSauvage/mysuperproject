@@ -1,26 +1,21 @@
+import logging
 from helpers.HttpCaller import HttpCaller, UnauthorizedException
 from helpers.Oauth2Helper import Oauth2Helper
 import json
-import datetime
 import sys
+import datetime
 from pathlib import Path
+from apiDataCollection.APIConstants import FTConstants
+from helpers.Chronometer import Chronometer
 
-FRANCE_TRAVAIL_FILE_NAME = "FRANCE_TRAVAIL_API"
-ACCEPTED_CRITERAS = [
-    "departement, publieeDepuis, maxCreationDate, minCreationData"]
-JSON_KEYS = {  # (key,value) : (our keys, france_travail keys)
-    "technical_id": "id",
-    "place": "lieuTravail",
-    "publication_date": "dateCreation",
-    "actualisation_date": "dateActualisation",
-    "rome_libelle": "romeLibelle",
-    "appellation_libelle": "appellationlibelle",
-    "contrat_type": "typeContrat",
-    "experience": "experienceLibelle",
-    "salary": "salaire",
-    "sector": "secteurActiviteLibelle",
-    "qualification": "qualificationLibelle"
-}
+logger = logging.getLogger(__name__)
+
+
+FRANCE_TRAVAIL_FILE_NAME = FTConstants.FRANCE_TRAVAIL_FILE_NAME.value
+
+ACCEPTED_CRITERAS = FTConstants.ACCEPTED_CRITERAS.value
+
+JSON_KEYS = FTConstants.JSON_KEYS.value
 
 
 class FranceEmploiApiCaller:
@@ -33,6 +28,8 @@ class FranceEmploiApiCaller:
         UnauthorizedException: if the request return 400 or 401
 
     """
+    
+    chrono = Chronometer()
 
     def __init__(self, client_id: str, client_secret: str):
         self.client_id = client_id
@@ -57,6 +54,7 @@ class FranceEmploiApiCaller:
             client_secret=self.client_secret, params=params
         )
 
+    @chrono.timeit
     def get_jobs_by_criterias(self, criteres: dict = {}) -> dict:
         """get jobs by specified criterias
 
@@ -84,6 +82,7 @@ class FranceEmploiApiCaller:
 
         # if Unauthorized response, raise exception
         if (response.status_code == 401 or response.status_code == 400):
+            logger.error(response.content)
             raise UnauthorizedException(response.content)
 
         return response
@@ -108,13 +107,16 @@ class DepartmentJobsCaller:
             maxCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z'
             minCreationDate (string) : format yyyy-MM-dd'T'hh:mm:ss'Z')
         """
-        assert (key in ACCEPTED_CRITERAS for key in optionnals.keys())
+        assert (
+            key in ACCEPTED_CRITERAS for key in optionnals.keys())
         self.FranceEmploiApiCaller = FranceEmploiApiCaller
         self.criteras = optionnals
         self.range_min = 0
         self.range_max = 149
         f_name = self.__create_file_name(self.criteras["departement"])
-        self.json_file_path = Path(path) / f"{f_name}.json"
+        self.json_file_path = path / f"{f_name}.json"
+        logger.info(f"Start retrieve jobs with criteras {self.criteras}")
+        logger.info(f"Data will be store in {self.json_file_path}")
 
     def __create_file_name(self, department: str) -> str:
         """Create file name based on actual day :
@@ -128,7 +130,8 @@ class DepartmentJobsCaller:
         """
         now = datetime.datetime.now()
         self.dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_dep{department}_{self.dt_string}"
+        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_raw_dep{department}_{self.dt_string}"
+        logger.info("Successfully file created")
         return file_name
 
     def __retrieve_number_of_jobs(self, header: dict) -> int:
@@ -144,11 +147,12 @@ class DepartmentJobsCaller:
         """
         to_parse = header["Content-Range"]
         number_of_jobs = to_parse.split('/')[1]
+        logger.info(f"Number of jobs {number_of_jobs}")
         return int(number_of_jobs)
 
     def __store_value(self, result: dict, key: str):
         """Store value of the result["key"] if exist, else store None
-
+        #TODO : don't store None
         Args:
             result (dict): job in json format
             key (str): key
@@ -172,8 +176,10 @@ class DepartmentJobsCaller:
         for res in json_data:
             cleaned_data = {}
             for (j_key, france_travail_key) in JSON_KEYS.items():
-                cleaned_data[j_key] = self.__store_value(
+                new_data = self.__store_value(
                     res, france_travail_key)
+                if new_data is not None:
+                    cleaned_data[j_key] = new_data
             todump.append(cleaned_data)
 
     def get_jobs_by_department(self):
@@ -193,9 +199,12 @@ class DepartmentJobsCaller:
             self.criteras["range"] = f"{str(self.range_min)}-{str(self.range_max)}"
 
             try:  # If exception raise, close the file and quit the program
+                logger.info(f"Retrieve jobs in range : "
+                            f"{self.range_min} - {self.range_max}")
                 response = self.FranceEmploiApiCaller.get_jobs_by_criterias(
                     self.criteras)
             except UnauthorizedException:
+                logger.error(response.content)
                 json_file.close()
                 sys.exit(1)
 

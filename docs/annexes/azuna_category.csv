@@ -1,0 +1,31 @@
+,__CLASS__,tag,label
+0,Adzuna::API::Response::Category,accounting-finance-jobs,Emplois Comptabilité et Finance
+1,Adzuna::API::Response::Category,it-jobs,Emplois Informatique
+2,Adzuna::API::Response::Category,sales-jobs,Emplois Vente
+3,Adzuna::API::Response::Category,customer-services-jobs,Emplois Services client
+4,Adzuna::API::Response::Category,engineering-jobs,Emplois Ingénierie
+5,Adzuna::API::Response::Category,hr-jobs,Emplois RH et Recrutement
+6,Adzuna::API::Response::Category,healthcare-nursing-jobs,Emplois Soins de santé et infirmiers
+7,Adzuna::API::Response::Category,hospitality-catering-jobs,Emplois Hospitalité et Restauration
+8,Adzuna::API::Response::Category,pr-advertising-marketing-jobs,"Emplois RP, Publicité et Marketing"
+9,Adzuna::API::Response::Category,logistics-warehouse-jobs,Emplois Distribution et Entrepôts
+10,Adzuna::API::Response::Category,teaching-jobs,Emplois Enseignement
+11,Adzuna::API::Response::Category,trade-construction-jobs,Emplois Industrie et Construction
+12,Adzuna::API::Response::Category,admin-jobs,Emplois Administration
+13,Adzuna::API::Response::Category,legal-jobs,Emplois Droit
+14,Adzuna::API::Response::Category,creative-design-jobs,Emplois Création et Design
+15,Adzuna::API::Response::Category,graduate-jobs,Emplois Diplômés
+16,Adzuna::API::Response::Category,retail-jobs,Emplois Commerce détail
+17,Adzuna::API::Response::Category,consultancy-jobs,Emplois Consultants
+18,Adzuna::API::Response::Category,manufacturing-jobs,Emplois Fabrication
+19,Adzuna::API::Response::Category,scientific-qa-jobs,Emplois Scientifiques et AQ
+20,Adzuna::API::Response::Category,social-work-jobs,Emplois Travail social
+21,Adzuna::API::Response::Category,travel-jobs,Emplois Voyages
+22,Adzuna::API::Response::Category,energy-oil-gas-jobs,"Emplois Énergie, pétrole et gaz"
+23,Adzuna::API::Response::Category,property-jobs,Emplois Immobilier
+24,Adzuna::API::Response::Category,charity-voluntary-jobs,Emplois Caritatif et Volontariat
+25,Adzuna::API::Response::Category,domestic-help-cleaning-jobs,Emploi Aide ménagère et Nettoyage
+26,Adzuna::API::Response::Category,maintenance-jobs,Emplois Maintenance
+27,Adzuna::API::Response::Category,part-time-jobs,Emplois Temps partiel
+28,Adzuna::API::Response::Category,other-general-jobs,Emplois Autres/Général
+29,Adzuna::API::Response::Category,unknown,Unknown
