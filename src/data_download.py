@@ -42,11 +42,11 @@ def main():
 
     args = parse_args()
 
-    #FTDataCollector = DataCollector.FTDataCollector()
-    #FTDataCollector.collect(args)
+    FTDataCollector = DataCollector.FTDataCollector()
+    FTDataCollector.collect(args)
 
-    apecDataCollector = DataCollector.ApecDataCollector()
-    apecDataCollector.collect(args)
+    # apecDataCollector = DataCollector.ApecDataCollector()
+    # apecDataCollector.collect(args)
 
 
 if __name__ == "__main__":
