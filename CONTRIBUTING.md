@@ -20,7 +20,7 @@ cd FEV24-BDE-JOBMARKET
 
 Create a virtual environment :
 ```shell script
-python3 -m venv .env 
+python3.12 -m venv .env 
 ```
 
 Activate the virtual environment :
