@@ -11,13 +11,9 @@ Le sujet détaillé se retrouve [ici](https://docs.google.com/document/d/1qnaWpb
 - Emmanuelle LASTRUCCI
 - Fabien WAY
 
-## Utilisation
+## Lancement de la récupération des données France Travail
 ```bash
-export FRANCE_EMPLOI_CLIENT_ID={VALEUR}
-export FRANCE_EMPLOI_CLIENT_SECRET={VALEUR}
-export MUSE_CLIENT_SECRET={VALEUR}
-
-python3 sample/__main__.py
+python3 src/data_download.py downloads/France_Travail_22_04_24 --department 18  --publieeDepuis 1
 ```
 
 ## Comment participer
