@@ -52,6 +52,11 @@ google-chrome --version
 ```shell script
 git checkout -b my_contribution
 ```
+## Start mongodb and mongo-express contrainer
+
+```shell script
+sudo docker-compose up -d
+```
 
 ## Quit the virtual environment
 
