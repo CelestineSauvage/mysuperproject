@@ -48,6 +48,16 @@ pip3 install -r requirements.txt
 ```shell script
 sudo apt install google-chrome-stable
 ```
+```shell script
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+```
+```shell script
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+```
+```shell script
+sudo apt -f install
+```
+
 
 - Vérifier que le navigateur Web Google Chrome est bien installé :
 ```shell script
