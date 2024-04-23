@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 import tempfile
 from pathlib import Path
-from apiDataCollection.APIConstants import FTConstants, ApecConstants
+from transform.APIConstants import FTConstants, ApecConstants
 import json
 from unidecode import unidecode
 import re
@@ -38,15 +38,20 @@ class JobsProcess(ABC):
             if self._check_file(json_file):
                 logger.info(f"process json_file : {json_file}")
                 self.process_file(dir, json_file)
+                # rm file
+                json_file.unlink()
 
     def process_file(self, dir: Path, source_file: Path) -> list:
         f = open(source_file)
+        logger.debug("----------------------------")
+        logger.debug(f"source_file : {source_file}")
+        logger.debug(f"f : {f}")
         json_jobs_raw = json.load(f)["results"]
         json_jobs_cleaned = list(map(self.process_job, json_jobs_raw))
         f.close()
         self.write_jobs(json_jobs_cleaned, dir, source_file)
         return
-    
+
     def write_jobs(self, jobs: list, dir: Path, source_file: Path) \
             -> tempfile.TemporaryFile:
         # logger.debug(f"source {source_file}")
@@ -57,8 +62,6 @@ class JobsProcess(ABC):
         f_descriptor = open(process_file, "w")
         json.dump(jobs, f_descriptor, indent=4)
         f_descriptor.close()
-        # TODO : must return a temp file
-
 
     def _process_string(self, job: dict) -> dict:
         for j_key, value in job.items():
@@ -71,12 +74,6 @@ class JobsProcess(ABC):
                     job[j_key] = job[j_key].lower()  # lower case
                     job[j_key] = re.sub('[^0-9a-zA-Z]+', ' ', job[j_key])
         return job
-
-
-class FTJobsProcess(JobsProcess):
-
-    def __init__(self) -> None:
-        pass
 
     def _create_file_name(self, source_file: Path) -> str:
         """Create file name based on actual day :
@@ -94,6 +91,12 @@ class FTJobsProcess(JobsProcess):
         # logger.debug(f"process_file_name {process_file_name}")
         return process_file_name
 
+
+class FTJobsProcess(JobsProcess):
+
+    def __init__(self) -> None:
+        pass
+
     def _process_place(self, job: dict) -> dict:
         """format localisation in FT : "CODE DEPARTEMENT - COMMUNE"
 
@@ -107,10 +110,22 @@ class FTJobsProcess(JobsProcess):
         Returns:
             dict: _description_
         """
-        # logger.debug(job["place"]["libelle"])
+        logger.debug(job["place"]["libelle"])
         place = job["place"]["libelle"]
-        dep = place[0:2]
-        town = place[5:]
+        dep_tmp = re.findall(r'\d+', place)
+        # if dep
+        if len(dep_tmp) > 0:
+            dep = dep_tmp[0]
+            place = place.replace(dep, "")
+            if ('-' in place):
+                town = (place.split('-', 1))[1]
+            else:
+                town = ""
+        else:
+            dep = ""
+            town = place
+        town = town.strip()
+        dep = dep.strip()  # remove space
         job["place"] = {"town": town,
                         "department": dep}
         return job
@@ -123,13 +138,14 @@ class FTJobsProcess(JobsProcess):
                 job["sector"] = job_tag
                 break
             if count == nb_category:
-                logger.info("Job" + job["category"] + " activity is not in the default list")
+                logger.info("Job" + job["category"] +
+                            " activity is not in the default list")
         return job
 
     def _process_salary(self, job: dict) -> dict:
         if "salary" in job:
             if "libelle" in job["salary"]:
-                logger.debug("Process salary " + job["salary"])
+                logger.debug(f"Process salary  + {job['salary']}")
                 job["salary"] = job["salary"]["libelle"]
                 return job
         job.pop("salary")
@@ -167,17 +183,6 @@ class ApecJobsProcess(JobsProcess):
     def __init__(self) -> None:
         pass
 
-    def _create_file_name(self, source_file: Path) -> str:
-        """Create file name based on actual day :
-        format APEC_SCRAPING_pageX_Y_m_D_H_M_S.json
-        
-        Returns:
-            str: file name
-        """
-        raw_file_name = source_file.name
-        process_file_name = raw_file_name.replace("raw", "process")
-        return process_file_name
-    
     def _process_place(self, job: dict) -> dict:
         """format localisation in Apec : "COMMUNE - CODE DEPARTEMENT"
 
@@ -191,34 +196,46 @@ class ApecJobsProcess(JobsProcess):
         Returns:
             dict: _description_
         """
-        
-        town, dep = (job["place"].rsplit('-'))
-        town = town[0:-1]
-        dep = dep[1:]  # remove space
+        # Example : Monaco, Lille - 59, Blabla - 997
+        place = job["place"]
+        # all digit values
+        dep_tmp = re.findall(r'\d+', place)
+        # if dep
+        if len(dep_tmp) > 0:
+            dep = dep_tmp[-1]
+            place = place.replace(dep, "")
+            town = (place.rsplit('-', 1))[0]
+        else:
+            dep = ""
+            town = place
+        town = town.strip()
+        dep = dep.strip()  # remove space
         job["place"] = {"town": town,
                         "department": dep}
         return job
 
     def _process_date(self, job: dict) -> dict:
-        job["publication_date"] = datetime.strptime(job["publication_date"][-10:], '%d/%m/%Y').isoformat() + ".000Z"
-        job["actualisation_date"] = datetime.strptime(job["actualisation_date"][-10:], '%d/%m/%Y').isoformat() + ".000Z"
+        job["publication_date"] = datetime.strptime(
+            job["publication_date"][-10:], '%d/%m/%Y').isoformat() + ".000Z"
+        job["actualisation_date"] = datetime.strptime(
+            job["actualisation_date"][-10:], '%d/%m/%Y').isoformat() + ".000Z"
         return job
-        
+
     def _arranged_data(self, job: dict) -> dict:
         new_job = {}
         new_job["technical_id"] = job.pop("technical_id")
         new_job["source"] = APEC_SOURCE
         new_job["contents"] = job
         return new_job
-    
+
     def process_job(self, job: dict) -> dict:
         new_job = job
         new_job = self._process_place(new_job)
-        #new_job = self._process_salary(new_job)
+        # new_job = self._process_salary(new_job)
         new_job = self._process_string(new_job)
         new_job = self._process_date(new_job)
         new_job = self._arranged_data(new_job)
         return new_job
 
     def _check_file(self, file: Path):
-        return file.name.startswith(APEC_FILE_NAME)
+        return file.name.startswith(APEC_FILE_NAME + "_raw")

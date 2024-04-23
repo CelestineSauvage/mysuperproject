@@ -5,7 +5,8 @@ import json
 import sys
 import datetime
 from pathlib import Path
-from apiDataCollection.APIConstants import FTConstants
+# TODO : same constants with transform
+from extract.APIConstants import FTConstants
 from helpers.Chronometer import Chronometer
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class FranceEmploiApiCaller:
         UnauthorizedException: if the request return 400 or 401
 
     """
-    
+
     chrono = Chronometer()
 
     def __init__(self, client_id: str, client_secret: str):
@@ -130,7 +131,8 @@ class DepartmentJobsCaller:
         """
         now = datetime.datetime.now()
         self.dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_raw_dep{department}_{self.dt_string}"
+        file_name = f"{FRANCE_TRAVAIL_FILE_NAME}_raw_dep{
+            department}_{self.dt_string}"
         logger.info("Successfully file created")
         return file_name
 
@@ -196,7 +198,8 @@ class DepartmentJobsCaller:
         while self.range_max < (min(total, 3000)):
 
             # update new range of jobs to download
-            self.criteras["range"] = f"{str(self.range_min)}-{str(self.range_max)}"
+            self.criteras["range"] = f"{
+                str(self.range_min)}-{str(self.range_max)}"
 
             try:  # If exception raise, close the file and quit the program
                 logger.info(f"Retrieve jobs in range : "
