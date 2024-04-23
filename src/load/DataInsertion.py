@@ -149,9 +149,9 @@ def load_to_db():
         col = client.create_collection(db, job_col_name, jobs_schema_validator)
 
     current_dir = Path.cwd()
-    files_path_to_process = [p for p in current_dir.glob('data/data_to_insert/*.json') if p.is_file()]
+    files_path_to_process = [p for p in current_dir.glob('downloads/*/*.json') if p.is_file()]
 
-    for file_path in files_path_to_process[0:10]:
+    for file_path in files_path_to_process:
         logger.info(f"file under process : {file_path}")
         result = process_file_for_db_insertion(file_path, col)
         if result:

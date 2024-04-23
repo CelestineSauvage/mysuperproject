@@ -3,12 +3,11 @@ import sys
 import requests
 from pathlib import Path
 from datetime import datetime
-from apiDataCollection.apiCallers.FranceEmploiApiCaller import \
+from extract.apiCallers.FranceEmploiApiCaller import \
     FranceEmploiApiCaller, DepartmentJobsCaller
-from apiDataCollection.scraper.ApecScraper import ApecScraper
-from apiDataCollection.APIConstants import DataCollectorConstants, ApecConstants, FTConstants
+from extract.scraper.ApecScraper import ApecScraper
+from extract.APIConstants import DataCollectorConstants, ApecConstants, FTConstants
 from helpers.Chronometer import Chronometer
-from apiDataCollection import JobsProcess
 
 import logging
 logger = logging.getLogger(__name__)
@@ -163,44 +162,38 @@ class FTDataCollector:
         except KeyboardInterrupt:  # SIG INT
             sys.exit()
 
-        transformation = JobsProcess.FTJobsProcess()
-        transformation.process_directory(directory)
-
 
 class ApecDataCollector:
-    
+
     @staticmethod
     @chrono.timeit
     def collect(kwargs: dict):
-        print("Start of data collection for Apec")
+        logger.info("Start of data collection for Apec")
 
         directory = Path(kwargs[ARG_PATH])
         # create directory if doesn't exist
         directory.mkdir(parents=True, exist_ok=True)
         kwargs.pop(ARG_PATH)
-        
+
         if kwargs[ARG_PUBLISHED_SINCE] is None:
             published_since = ApecConstants.ANCIENNETE_PUBLICATION.value['tout']
         else:
-            published_since = ApecConstants.ANCIENNETE_PUBLICATION.value[kwargs[ARG_PUBLISHED_SINCE]]
-        
+            published_since = ApecConstants.ANCIENNETE_PUBLICATION.value[
+                kwargs[ARG_PUBLISHED_SINCE]]
+
         # Initialize the Apec scraper
         apecScraper = ApecScraper(directory)
 
         # Gets the jobs list with the criteria (=filter)
-        params = {"descending": "true", "sortsType": "DATE", "anciennetePublication": published_since}
-        
+        params = {"descending": "true", "sortsType": "DATE",
+                  "anciennetePublication": published_since}
+
         apecScraper.get_jobs_by_criterias(params)
 
         # Close the Apec scraper
         apecScraper.close_scraper()
 
-        print("End of data collection for Apec")
-        
-        print("Start of data transformation for Apec")
-        transformation = JobsProcess.ApecJobsProcess()
-        transformation.process_directory(directory)
-        print("End of data transformation for Apec")
+        logger.info("End of data collection for Apec")
 
 
 class CredentialNotFoundException(Exception):

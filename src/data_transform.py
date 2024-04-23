@@ -1,15 +1,12 @@
 import sys
 import logging
 import argparse
-from extract.APIConstants import DataCollectorConstants
-from extract import DataCollector
 from helpers.Chronometer import Chronometer
+from transform import JobsProcess
+from extract.APIConstants import DataCollectorConstants
+from pathlib import Path
 import datetime
 
-ARG_DATE_MIN = DataCollectorConstants.ARG_DATE_MIN.value
-ARG_DATE_MAX = DataCollectorConstants.ARG_DATE_MAX.value
-ARG_PUBLISHED_SINCE = DataCollectorConstants.ARG_PUBLISHED_SINCE.value
-ARG_DEPARTMENTS = DataCollectorConstants.ARG_DEPARTMENTS.value
 ARG_PATH = DataCollectorConstants.ARG_PATH.value
 
 
@@ -21,15 +18,6 @@ def parse_args():
     parser.add_argument(f"{ARG_PATH}", type=str,
                         help='directory where json files will be store')
     parser.add_argument("source", help='source of data')
-    parser.add_argument(f"--{ARG_DEPARTMENTS}",
-                        help='specified department, if not, all departments are dl')
-    parser.add_argument(f"--{ARG_PUBLISHED_SINCE}",
-                        help="1, 3, 7, 14 or 31 last day(s)")
-    # TODO FRANCE TRAVAIL API RETURN CODE 400
-    parser.add_argument(f"--{ARG_DATE_MIN}",
-                        help="format YYYY-MM-DD")
-    parser.add_argument(f"--{ARG_DATE_MAX}",
-                        help="format YYYY-MM-DD")
 
     args = parser.parse_args()
     args_dict = vars(args)
@@ -45,24 +33,26 @@ def main():
     dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
 
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(filename=f"logs/log_extract_{args["source"]}_{dt_string}.log",
+    logging.basicConfig(filename=f"logs/log_transform_{args["source"]}_{dt_string}.log",
                         format=log_format, level=logging.INFO)
 
     logger = logging.getLogger(__name__)
 
+    directory = Path(args[ARG_PATH])
+
     if args["source"] == "0":
         logger.info("Source : France Travail")
-        FTDataCollector = DataCollector.FTDataCollector()
-        FTDataCollector.collect(args)
+        transformation = JobsProcess.FTJobsProcess()
 
     elif args["source"] == "1":
 
         logger.info("Source : APEC")
-        apecDataCollector = DataCollector.ApecDataCollector()
-        apecDataCollector.collect(args)
+        transformation = JobsProcess.ApecJobsProcess()
 
     else:
         raise ValueError("Source must be 0 or 1")
+
+    transformation.process_directory(directory)
 
 
 if __name__ == "__main__":
