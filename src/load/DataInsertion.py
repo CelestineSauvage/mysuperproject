@@ -1,4 +1,4 @@
-from mongoDBGestion import MongoBddInfra
+from load import MongoBddInfra
 from pathlib import Path
 import json
 from datetime import datetime, timezone
@@ -6,9 +6,7 @@ import logging
 import sys
 
 
-level='INFO'
-log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging.basicConfig(format=log_format, level=level)
+
 logger = logging.getLogger(__name__)
 
 db_name = "jobmarket"
@@ -128,7 +126,7 @@ def insert_job(job, collection_name) -> None:
         sys.exit(f"Error occur during insert_job function. Error: \n {e}")
     
 
-def load_to_db():
+def load_to_db(data_folder):
     logger.info('load_to_db START FUNCTION')
     logger.debug('load_to_db START FUNCTION')
 
@@ -149,7 +147,7 @@ def load_to_db():
         col = client.create_collection(db, job_col_name, jobs_schema_validator)
 
     current_dir = Path.cwd()
-    files_path_to_process = [p for p in current_dir.glob('downloads/*/*.json') if p.is_file()]
+    files_path_to_process = [p for p in current_dir.glob(f'{data_folder}/*.json') if p.is_file()]
 
     for file_path in files_path_to_process:
         logger.info(f"file under process : {file_path}")
