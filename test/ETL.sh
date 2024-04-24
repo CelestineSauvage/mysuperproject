@@ -14,4 +14,4 @@ python3 src/data_transform.py downloads/TEST/FT_TEST 0
 
 # Load
 
-python3 src/load_data_into_db.py downloads/TEST/FT_TEST 
+python3 src/load_data_into_db.py downloads/TEST/APEC_TEST2 

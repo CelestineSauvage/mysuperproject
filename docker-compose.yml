@@ -12,6 +12,10 @@ services:
       - mongo-compose-network
     ports:
       - '27017:27017'
+    volumes:
+        - type: volume
+          source: mongodb_data_volume
+          target: /data/db
 
   mongoexpress:
     container_name: mongo-express
@@ -32,3 +36,7 @@ services:
 
 networks:
   mongo-compose-network:
+
+volumes:
+      mongodb_data_volume:
+        # external: true
