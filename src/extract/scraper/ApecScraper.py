@@ -58,8 +58,7 @@ class ApecScraper:
             self.jobs_search_url + "?" + parse.urlencode(criteres))
 
         # to round by excess (in order to be sure to get the last page in any case)
-        # total_pages = total_results // 20
-        total_pages = 5
+        total_pages = total_results // 20
 
         criteres["page"] = 1
 
