@@ -6,7 +6,7 @@ import sys
 import datetime
 from pathlib import Path
 # TODO : same constants with transform
-from extract.APIConstants import FTConstants
+from helpers.APIConstants import FTConstants
 from helpers.Chronometer import Chronometer
 
 logger = logging.getLogger(__name__)

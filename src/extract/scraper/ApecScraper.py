@@ -10,7 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from urllib import parse
 from retry import retry
 # TODO : same constants with transform
-from extract.APIConstants import ApecConstants
+from helpers.APIConstants import ApecConstants
 from helpers.Chronometer import Chronometer
 from datetime import datetime
 from pathlib import Path
