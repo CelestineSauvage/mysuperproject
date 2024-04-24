@@ -195,7 +195,7 @@ class DepartmentJobsCaller:
         json_todump = []
 
         # while all jobs not retrieve but < 3000 range
-        while self.range_max < (min(total, 3000)):
+        while self.range_min <= (min(total, 2999)):
 
             # update new range of jobs to download
             self.criteras["range"] = f"{
@@ -211,11 +211,15 @@ class DepartmentJobsCaller:
                 json_file.close()
                 sys.exit(1)
 
-            total = self.__retrieve_number_of_jobs(response.headers) - 1
-            json_response = json.loads(response.text)
-            self.__store_json(json_response["resultats"], json_todump)
+            total = self.__retrieve_number_of_jobs(response.headers)
+            try:
+                json_response = json.loads(response.text)
+                self.__store_json(json_response["resultats"], json_todump)
+            except json.decoder.JSONDecodeError as e:
+                logger.error(repr(e))
+                pass
             self.range_min = self.range_max + 1
-            self.range_max = min(self.range_max+150, total)
+            self.range_max = self.range_max+150
 
         self.criteras.pop("range")
         data = {"results": json_todump,
