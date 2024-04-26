@@ -24,12 +24,9 @@ logger = logging.getLogger(__name__)
 DB_NAME = "jobmarket"
 JOB_COL_NAME = 'job'
 
+# TODO a changer
 MONGO_USER = "admin"
 MONGO_PASS = "pass"
-
-client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
-db = client.client[DB_NAME]
-col = db[JOB_COL_NAME]
 
 # create app
 
@@ -40,9 +37,10 @@ app = FastAPI(
 
 # constants
 MAX_DEP = 20
+MAX_CATEGORY = 5
 
 
-def process_query_department(number):
+def process_query_department(groupby: str, number: str, limit=10):
     """request to mongodb stat from department
 
     Args:
@@ -53,13 +51,30 @@ def process_query_department(number):
     """
     return list(col.aggregate([
         {"$match": {"contents.place.department": f"{number}"}},
-        {"$group": {"_id": '$contents.place.town', "count": {"$sum": 1}}},
+        {"$group": {"_id": f'${groupby}', "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
-        {"$limit": MAX_DEP}
+        {"$limit": limit}
     ]))
 
 
-@ app.get("/jobmarket/department/{number}")
+# def process_search_title_department(number: str, limit=10):
+#     pass
+
+
+@ app.get("/jobmarket/department/{number}/category")
+async def stat_category(number):
+    """returns the MAX_DEP towns with the most job offers
+
+    Args:
+        number (_type_): department number
+
+    Returns:
+        list: [{town1 : count1}, {town2 : count2} ... ]
+    """
+    return process_query_department("contents.category", number, MAX_CATEGORY)
+
+
+@ app.get("/jobmarket/department/{number}/town")
 async def stat_department(number):
     """returns the MAX_DEP towns with the most job offers
 
@@ -69,4 +84,8 @@ async def stat_department(number):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
-    return process_query_department(number)
+    return process_query_department("contents.place.town", number, MAX_DEP)
+
+client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
+db = client.client[DB_NAME]
+col = db[JOB_COL_NAME]
