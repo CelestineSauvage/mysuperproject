@@ -29,6 +29,11 @@ git clone git@github.com:YOUR_GIT_USERNAME/FEV24-BDE-JOBMARKET.git
 cd FEV24-BDE-JOBMARKET
 ```
 
+- Installer venv si pas déjà installé :
+```shell script
+sudo apt-get install python3.12-venv
+```
+
 - Créer un environnement virtuel :
 ```shell script
 python3.12 -m venv .env 
