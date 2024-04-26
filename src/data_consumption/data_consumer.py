@@ -3,7 +3,7 @@ from dash import dcc, html, Input, Output
 import pandas as pd
 import plotly.express as px
 
-# Données d'exemple (à remplacer par vos propres données)
+# Données d'exemple
 data = {
     "75": {"Paris": 5000, "Boulogne-Billancourt": 3000, "Levallois-Perret": 2500, "Neuilly-sur-Seine": 2000,
            "Issy-les-Moulineaux": 1800, "Montrouge": 1500, "Vincennes": 1400, "Vanves": 1300,
@@ -22,18 +22,36 @@ data = {
            "Nîmes": 200, "Nîmes": 100}
 }
 
-# Créer un dictionnaire de numéro de département et nom de département
+# Création du dictionnaire de numéro de département et nom de département
 departments = {
     "75": "Paris",
     "31": "Haute-Garonne",
     "30": "Gard"
 }
 
-# Créer l'application Dash
-app = dash.Dash(__name__)
 
-# Créer la mise en page
+# Création de l'application Dash
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
+                suppress_callback_exceptions=True)
 app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    html.Div(id='page-content')
+])
+
+# Page d'accueil
+home_page_layout = html.Div([
+    html.H1('Projet JOB Market', style={
+            'color': 'aquamarine', 'textAlign': 'center'}),
+    html.Button(dcc.Link('Top des villes recrutant le plus par département',
+                href='/top-cities-for-department')),
+    # html.Br(),
+    # html.Button(dcc.Link('Autre-page', href='/autre-page'))
+], style={'alignItems': 'center', 'background': 'beige'})
+
+
+# Page Top des villes recrutant le plus par département
+top_cities_for_department_layout = html.Div([
     html.H1("Top N des villes recrutant le plus par département"),
     html.Div([
         dcc.Dropdown(
@@ -44,36 +62,38 @@ app.layout = html.Div([
         ),
         dcc.Slider(
             id="slider-top-cities",
-            min=2,
-            max=30,
+            min=1,
+            max=20,
             step=1,
             value=10,
             marks={i: str(i) for i in range(2, 31)}
         )
     ]),
-    dcc.Graph(id="bar-chart")
-])
+    html.Div(dcc.Graph(id="bar-top-cities-for-department")),
+    html.Button(dcc.Link('Revenir à la page d\'accueil', href='/'))
+], style={'background': 'beige'})
+
+# Fonction de création du graphique à barres pour la page du top des villes recrutant le plus par département
 
 
-def create_bar_chart(df):
-    # Créer le graphique à barres
+def create_bar_top_cities_for_department(df):
     fig = px.bar(df,
                  x=df.index,
                  y="Nombre d'offres",
                  text=df["Nombre d'offres"],
                  title=f"Top {df.shape[0]} villes recrutant le plus")
 
-    # Personnaliser le graphique
+    # Personnalisation du graphique
     fig.update_traces(marker_color='rgb(0,102,204)',
                       marker_line_color='rgb(8,48,107)',
                       marker_line_width=1.5,
                       opacity=0.8,
-                      name='Nombre d\'offres')  # Ajouter un nom pour la légende
+                      name='Nombre d\'offres')  # Ajouter du nom pour la légende
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(
-            title='Nom de la ville',  # Ajouter le titre de l'axe des abscisses
+            title='Nom de la ville',  # Ajout du titre de l'axe des abscisses
             showline=True,
             showgrid=False,
             showticklabels=True,
@@ -98,7 +118,7 @@ def create_bar_chart(df):
 
     return fig
 
-# Définir la fonction de mise à jour du nombre maximal de villes dans le slider
+# Fonction de mise à jour du nombre maximal de villes dans le slider
 
 
 @app.callback(
@@ -106,14 +126,14 @@ def create_bar_chart(df):
     [Input("dropdown-department", "value")]
 )
 def update_slider_max(selected_department):
-    max_cities = len(data[selected_department])
-    return max(max_cities, 2)  # Assurer que le nombre maximal est au moins 2
+    cities_of_dep = len(data[selected_department])
+    return min(cities_of_dep, 20)  # s'assurer que le nombre maximal est 20
 
-# Définir la fonction de mise à jour du graphique
+# Fonction de mise à jour du graphique à barres pour la page du top des villes recrutant le plus par département
 
 
 @app.callback(
-    Output("bar-chart", "figure"),
+    Output("bar-top-cities-for-department", "figure"),
     [Input("dropdown-department", "value"),
      Input("slider-top-cities", "value")]
 )
@@ -121,9 +141,21 @@ def update_bar_chart(selected_department, top_cities):
     df = pd.DataFrame.from_dict(
         data[selected_department], orient='index', columns=["Nombre d'offres"])
     df = df.sort_values(by="Nombre d'offres", ascending=False).head(top_cities)
-    return create_bar_chart(df)
+    return create_bar_top_cities_for_department(df)
 
 
-# Lancer l'application
+# Mise à jour de l'index
+@app.callback(dash.dependencies.Output('page-content', 'children'),
+              [dash.dependencies.Input('url', 'pathname')])
+def display_page(pathname):
+    if pathname == '/top-cities-for-department':
+        return top_cities_for_department_layout
+    # elif pathname == '/autre-page....':
+        # return autre_page_layout...
+    else:
+        return home_page_layout
+
+
+# Lancement de l'application
 if __name__ == '__main__':
     app.run_server(debug=True, host="0.0.0.0")
