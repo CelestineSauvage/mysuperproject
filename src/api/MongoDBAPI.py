@@ -10,6 +10,9 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from load import MongoBddInfra
 
+from unidecode import unidecode
+import re
+
 
 # security = HTTPBasic()
 
@@ -39,6 +42,17 @@ app = FastAPI(
 MAX_DEP = 20
 MAX_CATEGORY = 5
 
+client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
+db = client.client[DB_NAME]
+col = db[JOB_COL_NAME]
+
+
+def _process_string(val: str):
+    val = unidecode(val)
+    val = val.lower()  # lower case
+    val = re.sub('[^0-9a-zA-Z]+', ' ', val)
+    return val
+
 
 def process_query_department(groupby: str, number: str, limit=10):
     """request to mongodb stat from department
@@ -57,21 +71,38 @@ def process_query_department(groupby: str, number: str, limit=10):
     ]))
 
 
-# def process_search_title_department(number: str, limit=10):
-#     pass
+def process_search_title_department(title: str, number: str):
+    expr = re.compile(f"{_process_string(title)}")
+    return list(col.aggregate([
+        {"$match": {
+            "$and": [
+                {
+                    "contents.place.department": f"{number}"
+                },
+                {
+                    "$or": [
+                        {"contents.title": expr},
+                        {"contents.description": expr},
+                        {"contents.category": expr}
+                    ]}
+            ]
+        }}
+    ]))
 
 
-@ app.get("/jobmarket/department/{number}/category")
+@ app.get("/jobmarket/department/{number:int}/search")
+async def stat_search(search, number):
+    result = str(len(process_search_title_department(search, number)))
+    return {"result": result}
+
+
+@ app.get("/jobmarket/department/{number:int}/category")
 async def stat_category(number):
-    """returns the MAX_DEP towns with the most job offers
-
-    Args:
-        number (_type_): department number
-
-    Returns:
-        list: [{town1 : count1}, {town2 : count2} ... ]
-    """
-    return process_query_department("contents.category", number, MAX_CATEGORY)
+    result = process_query_department(
+        "contents.category", number, MAX_CATEGORY)
+    json_result = {"department": number,
+                   "result": result}
+    return json_result
 
 
 @ app.get("/jobmarket/department/{number}/town")
@@ -84,8 +115,7 @@ async def stat_department(number):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
-    return process_query_department("contents.place.town", number, MAX_DEP)
-
-client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
-db = client.client[DB_NAME]
-col = db[JOB_COL_NAME]
+    result = process_query_department("contents.place.town", number, MAX_DEP)
+    json_result = {"department": number,
+                   "result": result}
+    return json_result
