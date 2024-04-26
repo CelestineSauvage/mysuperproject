@@ -3,10 +3,6 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, Colle
 import sys
 import logging
 
-
-level='INFO'
-log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging.basicConfig(format=log_format, level=level)
 logger = logging.getLogger(__name__)
 
 class NoSchemasValidation(Exception):

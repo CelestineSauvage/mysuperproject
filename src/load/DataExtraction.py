@@ -4,9 +4,6 @@ import pandas as pd
 from datetime import datetime
 import re
 
-level = 'INFO'
-log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-logging.basicConfig(format=log_format, level=level)
 logger = logging.getLogger(__name__)
 
 db_name = "jobmarket"
