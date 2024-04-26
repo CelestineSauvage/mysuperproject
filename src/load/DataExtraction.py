@@ -50,15 +50,15 @@ def test():
     ########################################################
     # min max des heures intégrés
     min_max_publication_date = \
-    list(col.aggregate([
-        {
-            "$group": {
-                '_id': '$source',
-                "minPublicationDate": {"$min": "$contents.publication_date"},
-                "maxPublicationDate": {"$max": "$contents.publication_date"}
+        list(col.aggregate([
+            {
+                "$group": {
+                    '_id': '$source',
+                    "minPublicationDate": {"$min": "$contents.publication_date"},
+                    "maxPublicationDate": {"$max": "$contents.publication_date"}
+                }
             }
-        }
-    ]))
+        ]))
 
     ########################################################
     # Nombre d'offre par jours spécifique à chaque site. # Nombre d'offre par jours sur les x derniers jours?
@@ -66,24 +66,24 @@ def test():
     test = list(col.aggregate([
         {"$match": {
             "contents.publication_date": {'$gte': start_date}
-            }
+        }
         },
-        { "$project": {
+        {"$project": {
             "source": 1,
             "publiDate": {"$dateToString": {"date": "$contents.publication_date", "format": '%Y-%m-%d'}}
-            }
+        }
         },
-        { "$group": {
-                "_id": {"source": "$source", "publiDate": "$publiDate"},
-                "nb_job": {"$sum": 1}
-            }
+        {"$group": {
+            "_id": {"source": "$source", "publiDate": "$publiDate"},
+            "nb_job": {"$sum": 1}
+        }
         },
-        { "$project": {
-                "_id": 0,
-                "source": "$_id.source",
-                "publiDate": "$_id.publiDate",
-                "nb_job": 1
-            }
+        {"$project": {
+            "_id": 0,
+            "source": "$_id.source",
+            "publiDate": "$_id.publiDate",
+            "nb_job": 1
+        }
         },
         {"$sort": {"publiDate": 1}}
     ]))
@@ -103,7 +103,7 @@ def test():
                 "nb_job": 1
             }
         },
-        { "$sort": {"nb_job": -1}}
+        {"$sort": {"nb_job": -1}}
     ]))
     df_test = pd.DataFrame(test)
 
@@ -128,8 +128,6 @@ def test():
         }},
         {"$unset": ["title_cleaned", "description_cleaned", "category_cleaned"]}
     ]))
-        
-        
 
     # stat par région/département/grandes villes ?
 
@@ -142,6 +140,13 @@ def test():
         }
     ]))
 
+    list(col.find({"contents.place.department": "50"}, {"_id": 0, "town": 1}))
+    list(col.aggregate([
+        {"$match": {"contents.place.department": "19"}},
+        {"$group": {"_id": '$contents.place.town', "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 20}
+    ]))
 
 
 # genre par compétence par exemple ?
@@ -154,11 +159,7 @@ def test():
     #     })
     # )
 
-
     # jobs.find({"$source" :0})
-
 
     # # get taille of jos ccollection
     # print()
-
-

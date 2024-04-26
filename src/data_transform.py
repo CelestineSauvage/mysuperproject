@@ -3,7 +3,7 @@ import logging
 import argparse
 from helpers.Chronometer import Chronometer
 from transform import JobsProcess
-from extract.APIConstants import DataCollectorConstants
+from helpers.APIConstants import DataCollectorConstants
 from pathlib import Path
 import datetime
 
@@ -32,8 +32,12 @@ def main():
     now = datetime.datetime.now(datetime.UTC)
     dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
 
+    log_file_name = f"logs/log_extract_{args["source"]}_{dt_string}.log"
+    log_file_path = Path(log_file_name)
+    log_file_path.parent.mkdir(parents=True, exist_ok=True)
+
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(filename=f"logs/log_transform_{args["source"]}_{dt_string}.log",
+    logging.basicConfig(filename=log_file_path,
                         format=log_format, level=logging.INFO)
 
     logger = logging.getLogger(__name__)
