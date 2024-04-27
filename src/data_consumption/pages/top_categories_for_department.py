@@ -4,19 +4,14 @@ from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
 from api_requests import get_top_categories_for_dep
+from departments_list import departments
 import logging
+
 
 # setup logger
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=log_format, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-# Création du dictionnaire de numéro de département et nom de département # TODO A remplacer par des données dynamiques
-departments = {
-    "75": "Paris",
-    "31": "Haute-Garonne",
-    "30": "Gard"
-}
 
 # Variable contenant le dernier JSON des données obtenues de l'API Rest
 data = None

@@ -16,7 +16,7 @@ app.layout = html.Div([
             'color': 'aquamarine', 'textAlign': 'center'}),
     html.Div([
         html.Div(
-            dcc.Link(f"{page['name']} - {page['path']}", href=page["relative_path"])
+            dcc.Link(f"{page['name']}", href=page["relative_path"])
         ) for page in dash.page_registry.values()
     ], style={'alignItems': 'center', 'background': 'beige'}),
     html.Br(),
