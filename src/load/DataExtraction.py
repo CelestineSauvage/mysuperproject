@@ -107,6 +107,13 @@ def test():
     ]))
     df_test = pd.DataFrame(test)
 
+    test = list(col.aggregate([
+        {"$match": {"contents.place.department": "59"}},
+        {"$group": {"_id": "$contents.experience", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]))
+
     ########################################################
     # les offres avec "Data engineer" -> stat sur des métiers comme ça (modifié)
     value1 = 'Data Engineer'
