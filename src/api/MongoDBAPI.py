@@ -13,6 +13,8 @@ from load import MongoBddInfra
 from unidecode import unidecode
 import re
 
+from .FastApiConstants import FastApiConstants
+
 
 # security = HTTPBasic()
 
@@ -31,6 +33,9 @@ REGION = 'region'
 # TODO a changer
 MONGO_USER = 'admin'
 MONGO_PASS = 'pass'
+
+MOINS_1_AN = FastApiConstants.MOINS_1_AN.value
+EXP_1_4 = FastApiConstants.EXP_1_4.value
 
 # create app
 
@@ -137,6 +142,32 @@ async def stat_town_department(number):
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
     result = groupby_in_department("contents.place.town", number, MAX_DEP)
+    json_result = {"department": number,
+                   "result": result}
+    return json_result
+
+
+@ app.get("/jobmarket/department/{number}/experience")
+async def stat_exp_department(number):
+    """returns the numbers of jobs which required less than a year, one to 4 year et more 4 years experience
+
+    Args:
+        number (_type_): department number
+
+    Returns:
+        list: [{town1 : count1}, {town2 : count2} ... ]
+    """
+    r_result = groupby_in_department("contents.experience", number)
+    result = {"moins_1_an": 0,
+              "exp_1_4_an": 0,
+              "exp_4_an": 0}
+    for sub in r_result:
+        if sub["_id"] in MOINS_1_AN:
+            result["moins_1_an"] += sub["count"]
+        elif sub["_id"] in EXP_1_4:
+            result["exp_1_4_an"] += sub["count"]
+        else:
+            result["exp_4_an"] += sub["count"]
     json_result = {"department": number,
                    "result": result}
     return json_result
