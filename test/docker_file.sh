@@ -13,7 +13,7 @@ FRANCE_EMPLOI_CLIENT_ID=PAR_jobmarketdatascientes_61aafad40553798b7d6198a1ece509
 FRANCE_EMPLOI_CLIENT_SECRET=cdde83cbc9fb9d77ceb336af8d0dbacc1c11aaab3cd302f70792ab3c3a338e50
 
 # Container creation
-sudo docker container run \                                                                                                                                                                       !1531
+sudo docker container run \
     --rm \
     --env-file=file_env \
     -v etl_process:/project/downloads/FT \
