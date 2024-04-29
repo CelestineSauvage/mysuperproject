@@ -1,5 +1,5 @@
 import logging
-from load import MongoBddInfra
+from helpers import MongoBddInfra
 import pandas as pd
 from datetime import datetime
 import re
