@@ -9,16 +9,23 @@ app = dash.Dash(__name__,
                 suppress_callback_exceptions=True
         )
 
-dash.register_page("home",  path='/')
-
 app.layout = html.Div([
-    html.H1('Projet JOB Market', style={
-            'color': 'aquamarine', 'textAlign': 'center'}),
+    #html.Div(
+    #    html.Img(src=image_url, style={'width': '100%'}),
+    #    style={'textAlign': 'center'}
+    #),
+    html.H1('Projet JOB Market', 
+            style={'color': 'blue', 'textAlign': 'center', 
+                'font-size': '50px', 'font-weight': 'bold'}),
     html.Div([
         html.Div(
-            dcc.Link(f"{page['name']}", href=page["relative_path"])
+            dcc.Link(page["name"], href=page["relative_path"]), 
+            style={'margin': '10px', 'padding': '10px', 'border': '1px solid #ccc',
+            'borderRadius': '5px', 'background': 'lightblue', 
+            'textAlign': 'center', 'font-weight': 'bold'}
         ) for page in dash.page_registry.values()
-    ], style={'alignItems': 'center', 'background': 'beige'}),
+        ], style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 
+            'marginTop': '20px', 'backgroundColor': '#f9f9f9', 'padding': '20px'}),
     html.Br(),
     dash.page_container
 ])

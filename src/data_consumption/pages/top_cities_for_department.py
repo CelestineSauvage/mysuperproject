@@ -22,7 +22,7 @@ app = dash.get_app()
 
 # Layout de la page
 layout = html.Div([
-    html.H1("Top des villes recrutant le plus par département"),
+    html.H2("Top des villes recrutant le plus par département"),
     html.Div([
         dcc.Dropdown(
             id="dropdown-department",

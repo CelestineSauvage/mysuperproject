@@ -13,20 +13,18 @@ log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=log_format, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Variable contenant le dernier JSON des données obtenues de l'API Rest
-data = None
-
 dash.register_page(__name__, path= "/job-repartition-by-experience-level-for-dep")
 
 app = dash.get_app()
 
 # Layout de la page
 layout = html.Div([
-    html.H1("Répartition des jobs par niveau d'expérience"),
+    html.H2("Répartition des jobs par niveau d'expérience pour un département"),
     html.Div([
         dcc.Dropdown(
             id="dropdown-department",
-            options = [{'label': f"{dept['code']} - {dept['libelle']}", 'value': dept['code']} for dept in get_departments()],
+            options = [{'label': f"{dept['code']} - {dept['libelle']}", 
+                        'value': dept['code']} for dept in get_departments()],
             value="75"  # Valeur par défaut : premier département
         )
     ]),
@@ -58,29 +56,22 @@ def create_bar_job_repartition_by_experience_level_for_dep(df):
     Input("dropdown-department", "value")
 )
 def update_bar_chart(selected_department):
-    if not get_data(selected_department):
-        return dash.no_update
-    
-    # Création du DataFrame à partir des données JSON
-    df = pd.DataFrame.from_dict(data['result'], orient='index', columns=['Nombre'])
-    
-    return create_bar_job_repartition_by_experience_level_for_dep(df)
-
-def get_data(selected_department):
-    global data
     data = get_job_repartition_by_experience_level_for_dep(selected_department)
     
     if data == None:
         logger.error("No data obtained")
-        return False
-    else:
-        # Création d'un dictionnaire pour mapper les nouvelles clés
-        mapping = {
-            "exp_1_4_an": "1 à 4 ans",
-            "exp_4_an": "4 ans ou plus",
-            "moins_1_an": "Moins d'1 an"
-        }
-        # Renommer les clés dans le dictionnaire result
-        data["result"] = {mapping[key]: value for key, value in data["result"].items()}
+        return dash.no_update
+
+    # Création d'un dictionnaire pour mapper les nouvelles clés
+    mapping = {
+        "exp_1_4_an": "1 à 4 ans",
+        "exp_4_an": "4 ans ou plus",
+        "moins_1_an": "Moins d'1 an"
+    }
+    # Renommer les clés dans le dictionnaire result
+    data["result"] = {mapping[key]: value for key, value in data["result"].items()}
         
-        return True
+    # Création du DataFrame à partir des données JSON
+    df = pd.DataFrame.from_dict(data['result'], orient='index', columns=['Nombre'])
+    
+    return create_bar_job_repartition_by_experience_level_for_dep(df)

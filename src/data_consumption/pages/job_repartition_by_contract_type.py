@@ -3,25 +3,23 @@ from dash import dcc, html, callback
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
-from api_requests import get_departments, get_top_categories_for_dep
+from api_requests import get_departments, get_job_repartition_by_contract_type_for_dep
 import logging
 
-# Page Top 5 des catégories d'emplois recrutant le plus par département
+# Page de la répartition des jobs par type de contrat
 
 # setup logger
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=log_format, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-dash.register_page(__name__, path= "/top-categories-for-department")
+ 
+dash.register_page(__name__, path= "/job-repartition-by-contract-type-for-dep")
 
 app = dash.get_app()
 
-departments = get_departments()
-
 # Layout de la page
 layout = html.Div([
-    html.H2("Top 5 des catégories d'emplois recrutant le plus par département"),
+    html.H2("Répartition des jobs par type de contrat pour un département"),
     html.Div([
         dcc.Dropdown(
             id="dropdown-department",
@@ -30,11 +28,11 @@ layout = html.Div([
             value="75"  # Valeur par défaut : premier département
         )
     ]),
-    html.Div(dcc.Graph(id="pie-top-categories-for-department"))
+    html.Div(dcc.Graph(id="pie-job-repartition-by-contract-type-for-dep"))
 ], style={'background': 'beige'})
 
-# Fonction de création du graphique en camember
-def create_pie_top_categories_for_department(df):
+# Fonction de création du graphique à barres
+def create_pie_job_repartition_by_contract_type_for_dep(df):
     fig = px.pie(df,
         values="count",
         names="_id")
@@ -51,13 +49,13 @@ def create_pie_top_categories_for_department(df):
     
     return fig
 
-# Mise à jour du graphique en camember
+# Mise à jour du graphique à barres
 @callback(
-    Output("pie-top-categories-for-department", "figure"),
+    Output("pie-job-repartition-by-contract-type-for-dep", "figure"),
     Input("dropdown-department", "value")
 )
-def update_pie_chart(selected_department):
-    data = get_top_categories_for_dep(selected_department)
+def update_bar_chart(selected_department):
+    data = get_job_repartition_by_contract_type_for_dep(selected_department)
     
     if data == None:
         logger.error("No data obtained")
@@ -65,4 +63,4 @@ def update_pie_chart(selected_department):
     
     df = pd.DataFrame(data["result"])
     df = df.sort_values(by="count", ascending=False)
-    return create_pie_top_categories_for_department(df)
+    return create_pie_job_repartition_by_contract_type_for_dep(df)
