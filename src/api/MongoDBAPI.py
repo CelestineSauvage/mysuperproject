@@ -1,13 +1,9 @@
-from typing import Annotated, Optional
-from pydantic import BaseModel
 
 import logging
-import pandas as pd
 import json
-from functools import partial
+from bson.json_util import dumps
 
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import FastAPI, HTTPException, status
 from load import MongoBddInfra
 
 from unidecode import unidecode
@@ -37,11 +33,26 @@ MONGO_PASS = 'pass'
 MOINS_1_AN = FastApiConstants.MOINS_1_AN.value
 EXP_1_4 = FastApiConstants.EXP_1_4.value
 
+REGION_LIST = FastApiConstants.REGION_LIST.value
+
 # create app
 
 app = FastAPI(
     title="jobmarket API",
-    description="API to requests to mongoDB"
+    description="API to requests to mongoDB",
+    openapi_tags=[
+        {
+            'name': 'Listing',
+            'description': 'Listing'
+        },
+        {
+            'name': 'Department',
+            'description': 'functions that return data for department'
+        },
+        {
+            'name': 'Region',
+            'description': 'functions that return data for region'
+        }]
 )
 
 # constants
@@ -51,6 +62,7 @@ MAX_CATEGORY = 5
 client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
 db = client.client[DB_NAME]
 col_jobs = db[JOB_NAME]
+col_region = db[REGION]
 
 
 def _process_string(val: str):
@@ -69,11 +81,20 @@ def _search_by_department(dep: str):
     return {"contents.place.department": f"{dep}"}
 
 
-def _search_by_region(region: str):
-    pass
+def _search_by_region(reg: str):
+    if reg not in REGION_LIST:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Region code must be in {REGION_LIST}."
+        )
+    result = list(col_region.aggregate([
+        {"$match": {"region.code": f"{reg}"}}
+    ]))
+    deps = [x["code"] for x in result]
+    return {"contents.place.department": {"$in": deps}}
 
 
-def groupby_in_department(groupby: str, number: str, limit=10):
+def query_groupby(groupby: str, number: str, limit=10, place: str = "dep"):
     """request to mongodb stat from department
 
     Args:
@@ -82,21 +103,16 @@ def groupby_in_department(groupby: str, number: str, limit=10):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
+    if place == "reg":
+        filter = _search_by_region(number)
+    else:
+        filter = _search_by_department(number)
     return list(col_jobs.aggregate([
-        {"$match": _search_by_department(number)},
+        {"$match": filter},
         {"$group": {"_id": f'${groupby}', "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
         {"$limit": limit}
     ]))
-
-
-def exp_in_department(number: str):
-    list_num = range(1, 10)
-    query_result = groupby_in_department("contents.experience", number)
-    query_keys = query_result.key
-    for el in list_num:
-        if el in query_keys:
-            pass
 
 
 def search_string_in_department(title: str, number: str):
@@ -116,22 +132,22 @@ def search_string_in_department(title: str, number: str):
     ]))
 
 
-@ app.get("/jobmarket/department/{number:int}/search")
+@ app.get("/jobmarket/department/{number:int}/search", tags=['Department'])
 async def stat_search_department(search, number):
     result = str(len(search_string_in_department(search, number)))
     return {"result": result}
 
 
-@ app.get("/jobmarket/department/{number:int}/category")
+@ app.get("/jobmarket/department/{number:int}/category", tags=['Department'])
 async def stat_category_department(number):
-    result = groupby_in_department(
+    result = query_groupby(
         "contents.category", number, MAX_CATEGORY)
     json_result = {"department": number,
                    "result": result}
     return json_result
 
 
-@ app.get("/jobmarket/department/{number}/town")
+@ app.get("/jobmarket/department/{number}/town", tags=['Department'])
 async def stat_town_department(number):
     """returns the MAX_DEP towns with the most job offers
 
@@ -141,13 +157,29 @@ async def stat_town_department(number):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
-    result = groupby_in_department("contents.place.town", number, MAX_DEP)
+    result = query_groupby("contents.place.town", number, MAX_DEP)
     json_result = {"department": number,
                    "result": result}
     return json_result
 
 
-@ app.get("/jobmarket/department/{number}/experience")
+@ app.get("/jobmarket/region/{number}/town", tags=['Region'])
+async def stat_town_region(number):
+    """returns the MAX_DEP towns with the most job offers
+
+    Args:
+        number (_type_): region number
+
+    Returns:
+        list: [{town1 : count1}, {town2 : count2} ... ]
+    """
+    result = query_groupby("contents.place.town", number, MAX_DEP, place="reg")
+    json_result = {"region": number,
+                   "result": result}
+    return json_result
+
+
+@ app.get("/jobmarket/department/{number}/experience", tags=['Department'])
 async def stat_exp_department(number):
     """returns the numbers of jobs which required less than a year, one to 4 year et more 4 years experience
 
@@ -157,7 +189,7 @@ async def stat_exp_department(number):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
-    r_result = groupby_in_department("contents.experience", number)
+    r_result = query_groupby("contents.experience", number)
     result = {"moins_1_an": 0,
               "exp_1_4_an": 0,
               "exp_4_an": 0}
@@ -173,7 +205,7 @@ async def stat_exp_department(number):
     return json_result
 
 
-@ app.get("/jobmarket/department/{number}/contract")
+@ app.get("/jobmarket/department/{number}/contract", tags=['Department'])
 async def stat_contract_department(number):
     """returns the MAX_DEP towns with the most job offers
 
@@ -183,7 +215,7 @@ async def stat_contract_department(number):
     Returns:
         list: [{town1 : count1}, {town2 : count2} ... ]
     """
-    result = groupby_in_department("contents.contrat_type", number)
+    result = query_groupby("contents.contrat_type", number)
     for sub in result:
         if sub['_id'] is None:
             sub['_id'] = "non precise"
@@ -191,3 +223,53 @@ async def stat_contract_department(number):
     json_result = {"department": number,
                    "result": result}
     return json_result
+
+
+@ app.get("/jobmarket/region", tags=['Listing'])
+async def get_list_region():
+    """returns the list of region
+
+    Returns:
+        json: [
+                {
+                    "code": int,
+                    "libelle": str
+                }
+                }
+    """
+    result = list(col_region.aggregate([
+        {
+            "$project": {
+                "_id": 0,
+                "code": "$region.code",
+                "libelle": "$region.libelle"
+            }
+        }
+    ]))
+    return list({v['code']: v for v in result}.values())
+
+
+@ app.get("/jobmarket/departments", tags=['Listing'])
+async def get_list_departments():
+    """returns the list of departments and region
+
+    Returns:
+        json: [
+                {
+                    "code": int,
+                    "libelle": str,
+                    "region": {
+                        "code": int,
+                        "libelle": str
+                    }
+                }
+    """
+    return list(col_region.aggregate([
+        {
+            "$project": {
+                "_id": 0,
+                "code": 1,
+                "libelle": 1
+            }
+        }
+    ]))
