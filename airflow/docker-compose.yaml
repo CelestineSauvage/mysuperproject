@@ -69,6 +69,8 @@ x-airflow-common:
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- apache-airflow-providers-docker pymongo}
+    # _PIP_ADDITIONAL_REQUIREMENTS=apache-airflow-providers-docker==2.1.0rc2
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true'
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
@@ -81,14 +83,15 @@ x-airflow-common:
     # Needed for DockerOperator to work
     - /var/run/docker.sock:/var/run/docker.sock
   # Needed for DockerOperator to work. Can also be set as "airflow" but then it require more set-up in the dockers files.
-  # user: "${AIRFLOW_UID:-50000}:0"
-  user: "root"
+  user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
     redis:
       condition: service_healthy
     postgres:
       condition: service_healthy
+  networks:
+    - airflow-jobmarket
 
 services:
   postgres:
@@ -105,6 +108,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - airflow-jobmarket
 
   redis:
     image: redis:latest
@@ -117,7 +122,9 @@ services:
       retries: 50
       start_period: 30s
     restart: always
-
+    networks:
+      - airflow-jobmarket
+  
   airflow-webserver:
     <<: *airflow-common
     command: webserver
@@ -287,6 +294,34 @@ services:
       airflow-init:
         condition: service_completed_successfully
   
+  docker-proxy:
+    image: bobrik/socat
+    command: "TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock"
+    ports:
+      - "2376:2375"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - airflow-jobmarket
+  
+  # docker-socket-proxy:
+  #   image: tecnativa/docker-socket-proxy:0.1.1
+  #   environment:
+  #     CONTAINERS: 1
+  #     IMAGES: 1
+  #     AUTH: 1
+  #     POST: 1
+  #   privileged: true
+  #   ports:
+  #     - 127.0.0.1:2375:2375
+  #     # - "2376:2375"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   restart: always
+
+
+
+
   # database_mongodb:
   #   container_name: my_mongo
   #   image: mongo:5.0
@@ -324,5 +359,7 @@ volumes:
   postgres-db-volume:
   # mongodb_data_volume:
 
-# networks:
+networks:
+  airflow-jobmarket:
+    # external: true
 #   mongo-compose-network:
