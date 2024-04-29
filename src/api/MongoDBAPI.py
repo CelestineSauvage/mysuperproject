@@ -35,8 +35,8 @@ async def lifespan(app: FastAPI):
     # BEFORE FASTAPI LAUNCHER
 
     # Start client for mongodb
-    mongo_user = 'admin'
-    mongo_pass = 'pass'
+    mongo_user = os.getenv('MONGO_ADMIN')
+    mongo_pass = os.getenv('MONGO_ADMIN_PASS')
     client = MongoBddInfra.Mongodb(mongo_user, mongo_pass)
 
     # load 2 collections

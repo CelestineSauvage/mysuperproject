@@ -4,15 +4,17 @@ import json
 from datetime import datetime, timezone
 import logging
 import sys
-
+import os
+from .LoadConstants import MongoDBConstants
 
 logger = logging.getLogger(__name__)
 
-MONGO_USER = "admin"
-MONGO_PASS = "pass"
+MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
+MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
 
-db_name = "jobmarket"
-job_col_name = 'job'
+DB_NAME = MongoDBConstants.DB_NAME.value
+JOB_COL_NAME = MongoDBConstants.JOB_COL_NAME.value
+
 jobs_schema_validator = {
     "$jsonSchema": {
         "bsonType": "object",
@@ -83,8 +85,8 @@ def get_jobs_from_file(file):
         content_file_json = json.loads(content_file_str)
         return content_file_json
     except Exception as e:
-        logger.info(f"get_jobs_from_file function : file = {
-                    file}, ERROR was :\n {e}")
+        logger.info(f"get_jobs_from_file function : file ="
+                    f"{file}, ERROR was :\n {e}")
         return False
 
 
@@ -93,7 +95,7 @@ def parse_and_insert_jobs_into_db(jobs: list, collection) -> None:
     for job in jobs:
         job_parsed = parse_and_clean_job(job)
         if not job_parsed:
-            #### STEP TO DO #####
+            # STEP TO DO
             logger.debug('job should be send to error collection')
             pass
         else:
@@ -121,8 +123,8 @@ def parse_and_clean_job(job: dict) -> dict:
 
         return job
     except Exception as e:
-        sys.exit(f'Error during parse_and_clean_job,\n job_to_process = {
-                 job}\nerror is:{e}')
+        sys.exit(f"Error during parse_and_clean_job,\n job_to_process ="
+                 f"{job}\nerror is:{e}")
 
 
 def insert_job(job, collection_name) -> None:
@@ -144,18 +146,18 @@ def load_to_db(data_folder):
     client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
 
     # db
-    is_db = client.is_database(db_name)
+    is_db = client.is_database(DB_NAME)
     if is_db:
-        db = client.client[db_name]
+        db = client.client[DB_NAME]
     else:
-        db = client.create_database(db_name)
+        db = client.create_database(DB_NAME)
 
     # collection
-    is_collection = client.is_collection(db, job_col_name)
+    is_collection = client.is_collection(db, JOB_COL_NAME)
     if is_collection:
-        col = db[job_col_name]
+        col = db[JOB_COL_NAME]
     else:
-        col = client.create_collection(db, job_col_name, jobs_schema_validator)
+        col = client.create_collection(db, JOB_COL_NAME, jobs_schema_validator)
 
     current_dir = Path.cwd()
     files_path_to_process = [p for p in current_dir.glob(
