@@ -1,5 +1,6 @@
-import MongoBddInfra
+import helpers.MongoBddInfra as MongoBddInfra
 import json
+from pathlib import Path
 
 MONGO_USER = "admin"
 MONGO_PASS = "pass"
@@ -7,11 +8,24 @@ MONGO_PASS = "pass"
 DB_NAME = "jobmarket"
 JOB_COL_NAME = 'region'
 
-client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
-db = client.client[DB_NAME]
-col = db[JOB_COL_NAME]
+if __name__ == "__main__":
 
-with open('./dep.json') as f:
-    file_data = json.load(f)
+    client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
+    # db
+    is_db = client.is_database(DB_NAME)
+    if is_db:
+        db = client.client[DB_NAME]
+    else:
+        db = client.create_database(DB_NAME)
 
-col.insert_many(file_data)
+    # collection
+    is_collection = client.is_collection(db, JOB_COL_NAME)
+    if is_collection:
+        col = db[JOB_COL_NAME]
+        col.drop()
+    col = client.create_collection(db, JOB_COL_NAME)
+
+    with open(Path(__file__).parent / Path('dep.json')) as f:
+        file_data = json.load(f)
+
+    col.insert_many(file_data)
