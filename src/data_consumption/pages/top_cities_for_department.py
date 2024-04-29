@@ -3,10 +3,10 @@ from dash import dcc, html, callback
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
-from api_requests import get_top_cities_for_dep
-from departments_list import departments
+from api_requests import get_departments, get_top_cities_for_dep
 import logging
 
+# Page du top des villes recrutant le plus par département
 
 # setup logger
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -20,14 +20,14 @@ dash.register_page(__name__, path= "/top-cities-for-department")
 
 app = dash.get_app()
 
-# Page Top des villes recrutant le plus par département
+# Layout de la page
 layout = html.Div([
     html.H1("Top des villes recrutant le plus par département"),
     html.Div([
         dcc.Dropdown(
             id="dropdown-department",
-            options=[{"label": f"{dept} - {dept_name}", "value": dept}
-                    for dept, dept_name in departments.items()],
+            options = [{'label': f"{dept['code']} - {dept['libelle']}", 
+                        'value': dept['code']} for dept in get_departments()],
             value="75"  # Valeur par défaut : premier département
         ),
         dcc.Slider(
@@ -40,10 +40,9 @@ layout = html.Div([
         )
     ]),
     html.Div(dcc.Graph(id="bar-top-cities-for-department"))
-    #html.Div(dcc.Link('Revenir à la page d\'accueil', href='/'))
 ], style={'background': 'beige'})
 
-# Fonction de création du graphique à barres pour la page du top des villes recrutant le plus par département
+# Fonction de création du graphique à barres
 def create_bar_top_cities_for_department(df):
     fig = px.bar(df,
         x="_id",
@@ -98,7 +97,7 @@ def update_max_slider_top_cities(selected_department):
     return min(len(data["result"]), 20), min(len(data["result"]), 10)
 
 
-# Mise à jour du graphique à barres pour la page du top des villes recrutant le plus par département
+# Mise à jour du graphique à barres
 @callback(
     Output("bar-top-cities-for-department", "figure"),
     [Input("dropdown-department", "value"),

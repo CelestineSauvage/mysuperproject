@@ -1,5 +1,6 @@
 import requests
 import logging
+from departments_list import departments
 
 # setup logger
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -15,6 +16,12 @@ def get_top_cities_for_dep(selected_department: str):
 # Fonction d'appel de l'API d'obtention du top 5 des catégories d'emplois qui proposent le plus d'offres pour un département donné
 def get_top_categories_for_dep(selected_department: str):
     return get(f"{fast_api_uri}/department/{selected_department}/category", "top 5 categories for dep")
+
+def get_job_repartition_by_experience_level_for_dep(selected_department: str):
+    return get(f"{fast_api_uri}/department/{selected_department}/experience", "job repartition by experience level for dep")
+
+def get_departments():
+    return get(f"{fast_api_uri}/departments", "Departments list")
 
 def get(url: str, get_type: str):
     try: 
