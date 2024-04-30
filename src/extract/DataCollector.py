@@ -6,7 +6,7 @@ from datetime import datetime
 from extract.apiCallers.FranceEmploiApiCaller import \
     FranceEmploiApiCaller, DepartmentJobsCaller
 from extract.scraper.ApecScraper import ApecScraper
-from extract.APIConstants import DataCollectorConstants, ApecConstants, FTConstants
+from helpers.APIConstants import DataCollectorConstants, ApecConstants
 from helpers.Chronometer import Chronometer
 
 import logging
