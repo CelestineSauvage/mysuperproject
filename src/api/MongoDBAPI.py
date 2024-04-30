@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
 
     # load 2 collections
     db_name = "jobmarket"
-    job_name = 'job'
+    job_name = 'jobs'
     region = 'region'
 
     db = client.client[db_name]
