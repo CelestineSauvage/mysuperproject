@@ -28,9 +28,13 @@ def get_job_repartition_by_experience_level_for_dep(selected_department: str):
 def get_job_repartition_by_contract_type_for_dep(selected_department: str):
     return get(f"{fast_api_uri}/department/{selected_department}/contract", "job repartition by contract type for dep")
 
-def get(url: str, get_type: str):
+# Fonction d'appel de l'API d'obtention du nombre de jobs pour un département avec recherche par texte libre
+def get_job_number_for_dep_on_search(selected_department: str, search_text: str):
+    return get(f"{fast_api_uri}/department/{selected_department}/contract", "job number for department on search text", {"search" : search_text})
+
+def get(url: str, get_type: str, params: dict = None):
     try: 
-        response = requests.get(url)
+        response = requests.get(url, params = params)
         response.raise_for_status() 
         return response.json()
     except requests.exceptions.HTTPError as errh: 
