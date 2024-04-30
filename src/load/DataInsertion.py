@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import logging
 import sys
 import os
-from .LoadConstants import MongoDBConstants
+from helpers.LoadConstants import MongoDBConstants
 
 logger = logging.getLogger(__name__)
 

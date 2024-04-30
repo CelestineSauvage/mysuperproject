@@ -1,7 +1,7 @@
 import helpers.MongoBddInfra as MongoBddInfra
 import json
 from pathlib import Path
-from load.LoadConstants import MongoDBConstants
+from helpers.LoadConstants import MongoDBConstants
 
 MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
 MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value

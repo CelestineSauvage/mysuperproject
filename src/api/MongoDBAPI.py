@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from helpers import MongoBddInfra
 from .FastApiQuery import JobQuery
 from .FastApiConstants import FastApiConstants
+from ..helpers.LoadConstants import MongoDBConstants
 
 from contextlib import asynccontextmanager
 import os
@@ -30,19 +31,27 @@ EXP_1_4 = FastApiConstants.EXP_1_4.value
 job_query = None
 
 
+MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
+MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
+
+DB_NAME = MongoDBConstants.DB_NAME.value
+REGION_COL_NAME = MongoDBConstants.REGION_COL_NAME.value
+JOB_COL_NAME = MongoDBConstants.JOB_COL_NAME.value
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # BEFORE FASTAPI LAUNCHER
 
     # Start client for mongodb
-    mongo_user = os.getenv('MONGO_ADMIN')
-    mongo_pass = os.getenv('MONGO_ADMIN_PASS')
+    mongo_user = MONGO_USER
+    mongo_pass = MONGO_PASS
     client = MongoBddInfra.Mongodb(mongo_user, mongo_pass)
 
     # load 2 collections
-    db_name = "jobmarket"
-    job_name = 'jobs'
-    region = 'region'
+    db_name = DB_NAME
+    job_name = JOB_COL_NAME
+    region = REGION_COL_NAME
 
     db = client.client[db_name]
     col_jobs = db[job_name]
