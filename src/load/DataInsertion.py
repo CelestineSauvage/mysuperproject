@@ -167,8 +167,7 @@ def load_to_db(data_folder):
         logger.info(f"file under process : {file_path}")
         result = process_file_for_db_insertion(file_path, col)
         if result:
-            # suppression du ficher
-            pass
+            file_path.unlink()
         else:
             # envoyer le fichier quelques part => error_path
             pass
