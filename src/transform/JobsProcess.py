@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import tempfile
 import os
 from pathlib import Path
-from src.helpers.APIConstants import FTConstants, ApecConstants
+from helpers.APIConstants import FTConstants, ApecConstants
 import json
 from unidecode import unidecode
 import re
