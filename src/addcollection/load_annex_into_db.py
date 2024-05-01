@@ -1,8 +1,9 @@
-import helpers.MongoBddInfra as MongoBddInfra
 import json
 from pathlib import Path
+from helpers import MongoBddInfra
 from helpers.LoadConstants import MongoDBConstants
 
+MONGO_HOST = MongoDBConstants.MONGO_HOST.value
 MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
 MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
 
@@ -15,7 +16,7 @@ if __name__ == "__main__":
     If already exists, remove and recreate.
     """
 
-    client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
+    client = MongoBddInfra.Mongodb(MONGO_HOST, MONGO_USER, MONGO_PASS)
     # db
     is_db = client.is_database(DB_NAME)
     if is_db:
@@ -30,7 +31,7 @@ if __name__ == "__main__":
         col.drop()
     col = client.create_collection(db, REGION_COL_NAME)
 
-    with open(Path(__file__).parent / Path('load/dep.json')) as f:
+    with open(Path(__file__).parent / Path('dep.json')) as f:
         file_data = json.load(f)
 
     col.insert_many(file_data)
