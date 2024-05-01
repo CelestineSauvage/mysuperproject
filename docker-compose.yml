@@ -5,9 +5,9 @@ services:
     container_name: my_mongo
     image: mongo:5.0
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ADMIN}
       - MONGO_INITDB_DATABASE=auth
-      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ADMIN_PASS}
     networks: 
       - mongo-compose-network
     ports:
@@ -26,11 +26,11 @@ services:
       - mongo-compose-network
     environment:
       - ME_CONFIG_MONGODB_SERVER=my_mongo
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ADMIN}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ADMIN_PASS}
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_ADMIN}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_ADMIN_PASS}
     ports:
       - '8081:8081' 
 

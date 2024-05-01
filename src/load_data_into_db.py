@@ -3,9 +3,10 @@ import logging
 import argparse
 from helpers.Chronometer import Chronometer
 import datetime
-from load import DataInsertion, DataExtraction
+from load import DataInsertion
 
 ARG_PATH = "path"
+
 
 def parse_args():
     # TODO add subparser for each data source
@@ -14,7 +15,7 @@ def parse_args():
         description='Load data into Db')
     parser.add_argument(f"{ARG_PATH}", type=str,
                         help='directory where json files will be store')
-    
+
     args = parser.parse_args()
     args_dict = vars(args)
     return args_dict

@@ -29,6 +29,11 @@ git clone git@github.com:YOUR_GIT_USERNAME/FEV24-BDE-JOBMARKET.git
 cd FEV24-BDE-JOBMARKET
 ```
 
+- Installer venv si pas déjà installé :
+```shell script
+sudo apt-get install python3.12-venv
+```
+
 - Créer un environnement virtuel :
 ```shell script
 python3.12 -m venv .env 
@@ -74,4 +79,15 @@ python3 src/data_download.py downloads/France_Travail_22_04_24 --department 18  
 
 ```shell script
 sudo docker-compose up -d
+```
+
+## LANCEMENT DE FAST-API
+pour le développement (se mettre dans le dossier `src`):
+ - Accès en local 
+```shell script
+uvicorn api.MongoDBAPI:app --port 8000 --reload
+```
+- Accès depuis l'extérieur 
+```shell script
+uvicorn api.MongoDBAPI:app --host 0.0.0.0 --port 8000 --reload
 ```

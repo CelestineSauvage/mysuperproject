@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
 import tempfile
+import os
 from pathlib import Path
-from transform.APIConstants import FTConstants, ApecConstants
+from helpers.APIConstants import FTConstants, ApecConstants
 import json
 from unidecode import unidecode
 import re
@@ -33,13 +34,20 @@ class JobsProcess(ABC):
         pass
 
     def process_directory(self, dir: Path):
+        logger.info(f"Process directory {dir}")
         json_files = list(dir.glob('**/*.json'))
         for json_file in json_files:
             if self._check_file(json_file):
                 logger.info(f"process json_file : {json_file}")
-                self.process_file(dir, json_file)
+                file_size = os.path.getsize(json_file)
+                if (file_size == 0):
+                    logger.warning(f"{json_file} : Empty file")
+                else:
+                    self.process_file(dir, json_file)
                 # rm file
                 json_file.unlink()
+                logger.info(f"{json_file} : file removed")
+        logger.info("All files are processed")
 
     def process_file(self, dir: Path, source_file: Path) -> list:
         f = open(source_file)

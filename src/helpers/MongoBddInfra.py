@@ -5,8 +5,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class NoSchemasValidation(Exception):
     pass
+
 
 class Mongodb:
     def __init__(self, username, password):
@@ -22,7 +24,7 @@ class Mongodb:
         self.check_client_connection()
 
         logger.info("Client connection created")
-    
+
     def init_connection(self):
         """_summary_
 
@@ -31,11 +33,11 @@ class Mongodb:
         """
         logger.debug("init_connection")
         self.client = MongoClient(
-                host=self.host,
-                port=self.port,
-                username=self.username,
-                password=self.password
-            )
+            host=self.host,
+            port=self.port,
+            username=self.username,
+            password=self.password
+        )
         return None
 
     def check_client_connection(self):
@@ -47,8 +49,8 @@ class Mongodb:
         logger.debug("check_client_connection")
         try:
             self.client.server_info()
-            print("MongoDB client is reachable")
-            print(self.client)
+            logger.info("MongoDB client is reachable")
+            logger.info(self.client)
             return True
         except ConnectionFailure as e:
             sys.exit(f"check_client_connection ERROR:\n{e}")
@@ -67,7 +69,7 @@ class Mongodb:
         logger.debug("is_database")
         is_db = db_name in self.client.list_database_names()
         return is_db
-    
+
     def create_database(self, db_name: str):
         """_summary_
 
@@ -80,17 +82,17 @@ class Mongodb:
         logger.debug("create_database")
         try:
             db = self.client[db_name]
-            logger.info(f'dataBase creaed : {db}')
+            logger.info(f'dataBase created : {db}')
             return db
         except Exception as e:
             raise (f"create_or_connect_database didn't work. \n Error : {e}")
-     
+
     @staticmethod
     def is_collection(db, col: str) -> bool:
         logger.debug("is_collection")
         is_col = col in db.list_collection_names()
         return is_col
-    
+
     @staticmethod
     def create_collection(db, collection_name: str, schema_validator=None):
         """_summary_
@@ -103,20 +105,18 @@ class Mongodb:
         logger.debug("create_database")
         try:
             coll = db.create_collection(collection_name)
-            
+
             db.command("collMod", collection_name, validator=schema_validator)
-            
+
             if schema_validator:
                 Mongodb.check_shema_collection_creation(db, collection_name)
-        
+
             logger.info(f'Collection Created : {coll}')
             return coll
-            
+
         except Exception as e:
             sys.exit(f"Error occur during create_collection. Error : \n {e}")
 
-        
-    
     @staticmethod
     def check_shema_collection_creation(db: object, collection_name: str):
         """_summary_
@@ -132,7 +132,8 @@ class Mongodb:
         try:
             shemas = db.get_collection(f'{collection_name}').options()
             if not shemas:
-                raise NoSchemasValidation(f'Schema Validation : empty for {collection_name}')
+                raise NoSchemasValidation(
+                    f'Schema Validation : empty for {collection_name}')
         except NoSchemasValidation as e:
-            sys.exit(f"Error occur during check_shema_collection_creation. Error: \n {e}")
- 
+            sys.exit(
+                f"Error occur during check_shema_collection_creation. Error: \n {e}")
