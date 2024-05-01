@@ -20,7 +20,7 @@ sudo docker container run \
     --rm \
     --env-file=extract_file_env \
     -it \
-    -v etl_volume:/project/download \
+    -v etl_volume:/project/downloads/FT \
     etl_extract:latest
     #    
     # etl_extract:latest
@@ -29,7 +29,7 @@ sudo docker container run \
 # TRANSFORM
 ##########
 
-sudo docker image build -t etl_transform:latest -f src/transform/Dockerfile .
+sudo docker image build -t etl_transform:1.0.0 -f src/transform/Dockerfile .
 # DOWNLOAD_FOLDER=downloads/FT
 # SOURCE=0
 sudo docker container run \
