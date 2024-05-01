@@ -68,10 +68,24 @@ sudo apt -f install
 google-chrome --version
 ```
 
-## LANCEMENT DE LA RECUPERATION DES DONNEES FRANCE TRAVAIL
+## LANCEMENT DE LA RECUPERATION DES DONNEES
 ```bash
-python3 src/data_download.py downloads/France_Travail_22_04_24 --source 0 --department 18  --publieeDepuis 1
+python3 src/data_download.py  --path downloads/FT --source 0 --department 18  --publieeDepuis 1
+python3 src/data_download.py --path downloads/APEC_1_MOIS --source 1  --publieeDepuis jour
 ```
+
+## PROCESSING DES FICHIERS
+```bash
+python3 src/data_transform.py --path downloads/FT_TEST --source 0  
+python3 src/data_transform.py --path downloads/APEC_TEST --source 1
+```
+
+## LOAD DANS LA BDD
+```bash
+python3 src/data_transform.py --path downloads/FT_TEST --source 0  
+python3 src/data_transform.py --path downloads/APEC_TEST --source 1
+```
+
 
 ## VARIABLES D'ENVIRONNEMENT
 Pour lancer le projet directement, il est nécessaire de définir 4 variables globales dans votre `.bashrc`.

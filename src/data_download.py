@@ -20,7 +20,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(
         description='Download jobs from France API in json files')
-    parser.add_argument(f"{ARG_PATH}", type=str,
+    parser.add_argument(f"--{ARG_PATH}", type=str,
                         help='directory where json files will be store')
     parser.add_argument(f"--{ARG_SOURCE}",
                         help='source of data')

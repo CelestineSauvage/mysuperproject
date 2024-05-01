@@ -8,6 +8,7 @@ from pathlib import Path
 import datetime
 
 ARG_PATH = DataCollectorConstants.ARG_PATH.value
+ARG_SOURCE = DataCollectorConstants.ARG_SOURCE.value
 
 
 def parse_args():
@@ -15,9 +16,10 @@ def parse_args():
 
     parser = argparse.ArgumentParser(
         description='Download jobs from France API in json files')
-    parser.add_argument(f"{ARG_PATH}", type=str,
+    parser.add_argument(f"--{ARG_PATH}", type=str,
                         help='directory where json files will be store')
-    parser.add_argument("source", help='source of data')
+    parser.add_argument(f"--{ARG_SOURCE}",
+                        help='source of data')
 
     args = parser.parse_args()
     args_dict = vars(args)
@@ -32,7 +34,7 @@ def main():
     now = datetime.datetime.now(datetime.UTC)
     dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-    log_file_name = f"logs/log_extract_{args["source"]}_{dt_string}.log"
+    log_file_name = f"logs/log_transform_{args[ARG_SOURCE]}_{dt_string}.log"
     log_file_path = Path(log_file_name)
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -44,11 +46,11 @@ def main():
 
     directory = Path(args[ARG_PATH])
 
-    if args["source"] == "0":
+    if args[ARG_SOURCE] == "0":
         logger.info("Source : France Travail")
         transformation = JobsProcess.FTJobsProcess()
 
-    elif args["source"] == "1":
+    elif args[ARG_SOURCE] == "1":
 
         logger.info("Source : APEC")
         transformation = JobsProcess.ApecJobsProcess()
