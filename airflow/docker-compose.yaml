@@ -68,8 +68,7 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
-    # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- apache-airflow-providers-docker pymongo}
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- apache-airflow-providers-docker pymongo}
     # _PIP_ADDITIONAL_REQUIREMENTS=apache-airflow-providers-docker==2.1.0rc2
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true'
     # The following line can be used to set a custom config file, stored in the local config folder
@@ -90,10 +89,49 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+    database_mongodb:
+      condition: service_started
   networks:
     - airflow-jobmarket
 
 services:
+  database_mongodb:
+    container_name: my_mongo
+    image: mongo:5.0
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_DATABASE=auth
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    networks: 
+      - airflow-jobmarket
+    ports:
+      - '27017:27017'
+    volumes:
+        - type: volume
+          source: mongodb_data_volume
+          target: /data/db
+
+  mongoexpress:
+    container_name: mongo-express
+    image: mongo-express:0.54
+    depends_on:
+      - database_mongodb
+    networks: 
+      - airflow-jobmarket
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=my_mongo
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    ports:
+      - '8081:8081' 
+
+
+
+
+
   postgres:
     image: postgres:13
     environment:
@@ -304,62 +342,9 @@ services:
     networks:
       - airflow-jobmarket
   
-  # docker-socket-proxy:
-  #   image: tecnativa/docker-socket-proxy:0.1.1
-  #   environment:
-  #     CONTAINERS: 1
-  #     IMAGES: 1
-  #     AUTH: 1
-  #     POST: 1
-  #   privileged: true
-  #   ports:
-  #     - 127.0.0.1:2375:2375
-  #     # - "2376:2375"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   restart: always
-
-
-
-
-  # database_mongodb:
-  #   container_name: my_mongo
-  #   image: mongo:5.0
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=admin
-  #     - MONGO_INITDB_DATABASE=auth
-  #     - MONGO_INITDB_ROOT_PASSWORD=pass
-  #   networks: 
-  #     - mongo-compose-network
-  #   ports:
-  #     - '27017:27017'
-  #   volumes:
-  #       - type: volume
-  #         source: mongodb_data_volume
-  #         target: /data/db
-
-  # mongoexpress:
-  #   container_name: mongo-express
-  #   image: mongo-express:0.54
-  #   depends_on:
-  #     - database_mongodb
-  #   networks: 
-  #     - mongo-compose-network
-  #   environment:
-  #     - ME_CONFIG_MONGODB_SERVER=my_mongo
-  #     - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-  #     - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
-  #     - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-  #     - ME_CONFIG_BASICAUTH_USERNAME=admin
-  #     - ME_CONFIG_BASICAUTH_PASSWORD=pass
-  #   ports:
-  #     - '8081:8081' 
-
 volumes:
   postgres-db-volume:
-  # mongodb_data_volume:
+  mongodb_data_volume:
 
 networks:
   airflow-jobmarket:
-    # external: true
-#   mongo-compose-network:

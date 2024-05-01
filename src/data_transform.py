@@ -32,7 +32,7 @@ def main():
     now = datetime.datetime.now(datetime.UTC)
     dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-    log_file_name = f"logs/log_extract_{args["source"]}_{dt_string}.log"
+    log_file_name = f"logs/log_transform_{args["source"]}_{dt_string}.log"
     log_file_path = Path(log_file_name)
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
 

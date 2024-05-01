@@ -4,6 +4,7 @@ import os
 
 class MongoDBConstants(Enum):
 
+    MONGO_HOST = os.getenv('MONGO_HOST')
     MONGO_ADMIN = os.getenv('MONGO_ADMIN')
     MONGO_ADMIN_PASS = os.getenv('MONGO_ADMIN_PASS')
 

@@ -5,7 +5,7 @@ sudo docker volume create etl_process
 # EXTRACT
 ##########
 # creation de l'image docker
-sudo docker image build -t etl_extract:latest -f src/extract/Dockerfile .
+sudo docker image build -t etl_extract:1.0.0 -f src/extract/Dockerfile .
 
 # file_env file for container
 # DOWNLOAD_FOLDER=downloads/FT
@@ -16,13 +16,13 @@ sudo docker image build -t etl_extract:latest -f src/extract/Dockerfile .
 # FRANCE_EMPLOI_CLIENT_SECRET=cdde83cbc9fb9d77ceb336af8d0dbacc1c11aaab3cd302f70792ab3c3a338e50
 
 # Container creation
-sudo docker container run \
-    --rm \
-    --env-file=extract_file_env \
-    -it \
-    -v etl_volume:/project/downloads/FT \
-    etl_extract:latest
-    #    
+# sudo docker container run \
+#     --rm \
+#     --env-file=extract_file_env \
+#     -it \
+#     -v etl_volume:/project/downloads/FT \
+#     etl_extract:latest
+#     #    
     # etl_extract:latest
 
 ##########
@@ -37,3 +37,5 @@ sudo docker container run \
     --rm \
     --env-file=transform_file_env \
     etl_transform:latest
+
+docker image build -t etl_transform:1.0.0 -f src/transform/Dockerfile .
