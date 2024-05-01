@@ -1,6 +1,5 @@
 
 import logging
-from bson.json_util import dumps
 
 from fastapi import FastAPI
 from helpers import MongoBddInfra

@@ -3,8 +3,8 @@ from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure, Colle
 import sys
 import logging
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 class NoSchemasValidation(Exception):
     pass

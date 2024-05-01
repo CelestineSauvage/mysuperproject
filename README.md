@@ -63,23 +63,89 @@ sudo dpkg -i google-chrome-stable_current_amd64.deb
 sudo apt -f install
 ```
 
-
 - Vérifier que le navigateur Web Google Chrome est bien installé :
 ```shell script
 google-chrome --version
 ```
 
-## LANCEMENT DE LA RECUPERATION DES DONNES FRANCE TRAVAIL
+## LANCEMENT DE LA RECUPERATION DES DONNEES
 ```bash
-python3 src/data_download.py downloads/France_Travail_22_04_24 --department 18  --publieeDepuis 1
+python3 src/data_download.py  --path downloads/FT --source 0 --department 75  --publieeDepuis 1
+python3 src/data_download.py --path downloads/APEC --source 1  --publieeDepuis jour
 ```
 
-## LANCEMENT DU SYSTEME DE GESTION DE BDD NOSQL MONGO DB
-- Start mongodb and mongo-express contrainer
+## PROCESSING DES FICHIERS
+```bash
+python3 src/data_transform.py --path downloads/FT --source 0  
+python3 src/data_transform.py --path downloads/APEC --source 1
+```
 
+## LOAD DANS LA BDD
+```bash
+python3 src/load_data_into_db.py --path downloads/FT
+python3 src/load_data_into_db.py --path downloads/APEC
+```
+
+
+## VARIABLES D'ENVIRONNEMENT
+Pour lancer le projet directement, il est nécessaire de définir 4 variables globales dans votre `.bashrc`.
+```bash
+# CLEF FRANCE TRAVAIL A RECUPERER ICI : https://francetravail.io/
+export FRANCE_EMPLOI_CLIENT_ID= #CLEF CLIENT
+export FRANCE_EMPLOI_CLIENT_SECRET= #CLEF SECRET
+
+# ADMIN MONGODO
+export MONGO_ADMIN=admin #valeur par défaut 
+export MONGO_ADMIN_PASS=pass #valeur par défaut 
+
+
+## CREATION ET LANCEMENT DE LA PILLE DOCKER (INCLUANT LE SYSTEME DE GESTION DE BDD NOSQL MONGODB)
+- Start mongodb and mongo-express contrainer
 ```shell script
 sudo docker-compose up -d
 ```
+
+## LANCEMENT DE FAST-API
+### EN LIGNE DE COMMANDE (pour dev uniquement)
+(Se positionner au préalable dans le dossier `src` du projet)
+ - Accès en local 
+```shell script
+uvicorn api.MongoDBAPI:app --port 8000 --reload
+```
+- Accès depuis l'extérieur 
+```shell script
+uvicorn api.MongoDBAPI:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### VIA DOCKER
+(Se positionner au préalable à la racine du projet)
+Créer l'image
+```shell script
+docker build --no-cache -t jmfastapi:1.0.0 -f src/api/Dockerfile .
+```
+Créer et lancer un nouveau container à partir de l'image créée
+```shell script
+docker run --network host -it jmfastapi:1.0.0
+```
+
+## LANCEMENT DE DASH
+### EN LIGNE DE COMMANDE (pour dev uniquement)
+ - Accès depuis l'extérieur (par défaut car l'host 0.0.0.0 est paramétré dans le code)
+```shell script
+python3 src/data_consumption/data_consumer.py
+```
+
+### VIA DOCKER
+(Se positionner au préalable à la racine du projet)
+Créer l'image
+```shell script
+docker build --no-cache -t jmdash:1.0.0 -f src/data_consumption/Dockerfile .
+```
+Créer et lancer un nouveau container à partir de l'image créée
+```shell script
+docker run --network host -it jmdash:1.0.0
+
+
 
 ## LANCEMENT DE FAST-API
 pour le développement (se mettre dans le dossier `src`):

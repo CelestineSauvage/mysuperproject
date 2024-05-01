@@ -13,7 +13,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(
         description='Load data into Db')
-    parser.add_argument(f"{ARG_PATH}", type=str,
+    parser.add_argument(f"--{ARG_PATH}", type=str,
                         help='directory where json files will be store')
 
     args = parser.parse_args()

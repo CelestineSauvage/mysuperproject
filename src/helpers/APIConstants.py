@@ -9,6 +9,7 @@ class DataCollectorConstants(Enum):
     ARG_PUBLISHED_SINCE = "publieeDepuis"
     ARG_DEPARTMENTS = "department"
     ARG_PATH = "path"
+    ARG_SOURCE = "source"
 
     # Env variables
     FT_CLIENT_ID = "FRANCE_EMPLOI_CLIENT_ID"
