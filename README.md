@@ -146,3 +146,38 @@ Créer et lancer un nouveau container à partir de l'image créée
 docker run --network host -it jmdash:1.0.0
 
 
+
+## LANCEMENT DE FAST-API
+pour le développement (se mettre dans le dossier `src`):
+ - Accès en local 
+```shell script
+uvicorn api.MongoDBAPI:app --port 8000 --reload
+```
+- Accès depuis l'extérieur 
+```shell script
+uvicorn api.MongoDBAPI:app --host 0.0.0.0 --port 8000 --reload
+```
+
+##### VARIABLE NECERSSAIRE DANS .env pour le fonctionnement du projet
+PROJECT_DIR=
+
+DOWNLOAD_DIR_FT=$PROJECT_DIR/download/FT
+DOWNLOAD_DIR_APEC=$PROJECT_DIR/download/APEC
+
+
+
+## CREATION DES IMAGES
+sudo docker image build -t etl_extract:1.0.0 -f src/extract/Dockerfile .
+sudo docker image build -t etl_transform:1.0.0 -f src/transform/Dockerfile .
+sudo docker image build -t etl_load_into_db:1.0.0 -f src/load/Dockerfile .
+
+## Création des volumes de partages sur le host
+mkdir -p /home/lastrucci/Téléchargements/TEST_PROJECT/logs_from_airflow
+mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/FT"
+mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/APEC"
+
+
+# Initiate airflow db:
+sudo docker compose up airflow-init
+<!-- Run the docker compose -->
+sudo docker compose up -d

@@ -9,6 +9,7 @@ from helpers.LoadConstants import MongoDBConstants
 
 logger = logging.getLogger(__name__)
 
+MONGO_HOST = MongoDBConstants.MONGO_HOST.value
 MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
 MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
 
@@ -143,7 +144,7 @@ def load_to_db(data_folder):
     logger.info('load_to_db START FUNCTION')
     logger.debug('load_to_db START FUNCTION')
 
-    client = MongoBddInfra.Mongodb(MONGO_USER, MONGO_PASS)
+    client = MongoBddInfra.Mongodb(MONGO_HOST, MONGO_USER, MONGO_PASS)
 
     # db
     is_db = client.is_database(DB_NAME)
@@ -161,7 +162,7 @@ def load_to_db(data_folder):
 
     current_dir = Path.cwd()
     files_path_to_process = [p for p in current_dir.glob(
-        f'{data_folder}/*.json') if p.is_file()]
+        f'{data_folder}/*process*.json') if p.is_file()]
 
     for file_path in files_path_to_process:
         logger.info(f"file under process : {file_path}")

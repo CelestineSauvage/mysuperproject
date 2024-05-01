@@ -33,8 +33,9 @@ def main():
     logging.basicConfig(filename=f"logs/log_loadData_{dt_string}.log",
                         format=log_format, level=logging.INFO)
     logger = logging.getLogger(__name__)
-
+    
     logger.info("load_data_into_db")
+    
     DataInsertion.load_to_db(args['path'])
 
 

@@ -6,16 +6,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class NoSchemasValidation(Exception):
     pass
 
 
 class Mongodb:
-    def __init__(self, username, password):
+    def __init__(self, host, username, password):
         logger.debug('Initiate Mongodb instane')
 
-        self.host = "127.0.0.1"
+        self.host = host
         self.port = 27017
         self.username = username
         self.password = password
