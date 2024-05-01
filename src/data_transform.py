@@ -3,7 +3,7 @@ import logging
 import argparse
 from helpers.Chronometer import Chronometer
 from transform import JobsProcess
-from extract.APIConstants import DataCollectorConstants
+from transform.APIConstants import DataCollectorConstants
 from pathlib import Path
 import datetime
 

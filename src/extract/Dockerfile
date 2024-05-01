@@ -14,9 +14,6 @@ COPY src/data_download.py project/data_download.py
 COPY src/extract project/extract
 COPY src/helpers project/helpers
 
-COPY requirements.txt /src
-
-
 WORKDIR project
 RUN mkdir logs
 
@@ -24,7 +21,5 @@ ENV DOWNLOAD_FOLDER=downloads/FT
 ENV SOURCE=0
 ENV PUBLIEEDEPUIS=1
 ENV ADDITIONAL_ARGUMENT=
-
-RUN mkdir -p $DOWNLOAD_FOLDER
 
 CMD python3 data_download.py $DOWNLOAD_FOLDER $SOURCE --publieeDepuis $PUBLIEEDEPUIS $ADDITIONAL_ARGUMENT

@@ -12,7 +12,7 @@ cleanup
     # Run through this guide from the very beginning, starting by re-downloading the docker-compose.yaml file
 
 
-sudo docker compose up
+sudo docker compose up -d
 
 # AIRFLOW_UID=1000
 # AIRFLOW_GID=0
