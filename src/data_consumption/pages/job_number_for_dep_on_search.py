@@ -46,4 +46,4 @@ def update_result(n_clicks, selected_department, search_text):
             logger.error("No data obtained")
             return dash.no_update
         
-        return data
+        return data["result"]
