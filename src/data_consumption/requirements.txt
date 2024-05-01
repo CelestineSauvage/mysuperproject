@@ -2,3 +2,4 @@ requests==2.31.0
 pandas==2.2.2
 dash==2.16.1
 plotly_express==0.4.1
+retry==0.9.2

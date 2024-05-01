@@ -56,6 +56,19 @@ services:
     ports:
       - '8000:8000'
 
+  dash:
+    container_name : jmdash
+    image : jmdash:1.0.0
+    depends_on:
+      fastapi:
+        condition : service_started
+    networks : 
+      - mongo-compose-network
+    env_file : 
+      .env
+    ports:
+      - '8050:8050'
+
 
 networks:
   mongo-compose-network:
