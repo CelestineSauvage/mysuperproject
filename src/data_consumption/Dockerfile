@@ -1,8 +1,8 @@
 # Utilisation de Python
 FROM python:3.12-slim
 
-# Copie des fichiers de requirements
-COPY requirements.txt ./requirements.txt
+# Copie du fichier de requirements
+COPY src/data_consumption/requirements.txt ./requirements.txt
 
 # Installation des dépendances Python
 RUN pip3 install -r requirements.txt
