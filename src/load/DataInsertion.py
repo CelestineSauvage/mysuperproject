@@ -9,10 +9,7 @@ from helpers.LoadConstants import MongoDBConstants
 
 logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
 MONGO_HOST = MongoDBConstants.MONGO_HOST.value
-=======
->>>>>>> develop
 MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
 MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
 

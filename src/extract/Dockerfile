@@ -6,9 +6,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get install -y ./google-chrome-stable_current_amd64.deb
 
-COPY requirements.txt project/requirements.txt
-RUN --mount=type=cache,target=/var/cache/pip3 \
-    pip3 install -r project/requirements.txt
+COPY src/extract/requirements.txt project/requirements.txt
+
+RUN pip3 install --no-cache-dir --upgrade -r /project/requirements.txt
 
 COPY src/data_download.py project/data_download.py
 COPY src/extract project/extract
@@ -22,4 +22,4 @@ ENV SOURCE=0
 ENV PUBLIEEDEPUIS=1
 ENV ADDITIONAL_ARGUMENT=
 
-CMD python3 data_download.py $DOWNLOAD_FOLDER $SOURCE --publieeDepuis $PUBLIEEDEPUIS $ADDITIONAL_ARGUMENT
+CMD python3 data_download.py --path $DOWNLOAD_FOLDER --source $SOURCE --publieeDepuis $PUBLIEEDEPUIS $ADDITIONAL_ARGUMENT
