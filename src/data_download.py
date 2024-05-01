@@ -12,6 +12,7 @@ ARG_DATE_MAX = DataCollectorConstants.ARG_DATE_MAX.value
 ARG_PUBLISHED_SINCE = DataCollectorConstants.ARG_PUBLISHED_SINCE.value
 ARG_DEPARTMENTS = DataCollectorConstants.ARG_DEPARTMENTS.value
 ARG_PATH = DataCollectorConstants.ARG_PATH.value
+ARG_SOURCE = DataCollectorConstants.ARG_SOURCE.value
 
 
 def parse_args():
@@ -21,7 +22,8 @@ def parse_args():
         description='Download jobs from France API in json files')
     parser.add_argument(f"{ARG_PATH}", type=str,
                         help='directory where json files will be store')
-    parser.add_argument("source", help='source of data')
+    parser.add_argument(f"--{ARG_SOURCE}",
+                        help='source of data')
     parser.add_argument(f"--{ARG_DEPARTMENTS}",
                         help='specified department, if not, all departments are dl')
     parser.add_argument(f"--{ARG_PUBLISHED_SINCE}",
@@ -45,7 +47,7 @@ def main():
     now = datetime.datetime.now(datetime.UTC)
     dt_string = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-    log_file_name = f"logs/log_extract_{args["source"]}_{dt_string}.log"
+    log_file_name = f"logs/log_extract_{args[ARG_SOURCE]}_{dt_string}.log"
     log_file_path = Path(log_file_name)
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -55,12 +57,12 @@ def main():
 
     logger = logging.getLogger(__name__)
 
-    if args["source"] == "0":
+    if args[ARG_SOURCE] == "0":
         logger.info("Source : France Travail")
         FTDataCollector = DataCollector.FTDataCollector()
         FTDataCollector.collect(args)
 
-    elif args["source"] == "1":
+    elif args[ARG_SOURCE] == "1":
 
         logger.info("Source : APEC")
         apecDataCollector = DataCollector.ApecDataCollector()
