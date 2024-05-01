@@ -70,20 +70,20 @@ google-chrome --version
 
 ## LANCEMENT DE LA RECUPERATION DES DONNEES
 ```bash
-python3 src/data_download.py  --path downloads/FT --source 0 --department 18  --publieeDepuis 1
-python3 src/data_download.py --path downloads/APEC_1_MOIS --source 1  --publieeDepuis jour
+python3 src/data_download.py  --path downloads/FT --source 0 --department 75  --publieeDepuis 1
+python3 src/data_download.py --path downloads/APEC --source 1  --publieeDepuis jour
 ```
 
 ## PROCESSING DES FICHIERS
 ```bash
-python3 src/data_transform.py --path downloads/FT_TEST --source 0  
-python3 src/data_transform.py --path downloads/APEC_TEST --source 1
+python3 src/data_transform.py --path downloads/FT --source 0  
+python3 src/data_transform.py --path downloads/APEC --source 1
 ```
 
 ## LOAD DANS LA BDD
 ```bash
-python3 src/data_transform.py --path downloads/FT_TEST --source 0  
-python3 src/data_transform.py --path downloads/APEC_TEST --source 1
+python3 src/load_data_into_db.py --path downloads/FT
+python3 src/load_data_into_db.py --path downloads/APEC
 ```
 
 
@@ -139,10 +139,10 @@ python3 src/data_consumption/data_consumer.py
 (Se positionner au préalable à la racine du projet)
 Créer l'image
 ```shell script
-docker build --no-cache -t dash:1.0.0 -f src/data_consumption/Dockerfile .
+docker build --no-cache -t jmdash:1.0.0 -f src/data_consumption/Dockerfile .
 ```
 Créer et lancer un nouveau container à partir de l'image créée
 ```shell script
-docker run --network host -it dash:1.0.0
+docker run --network host -it jmdash:1.0.0
 
 
