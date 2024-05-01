@@ -31,7 +31,7 @@ def main():
 
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(filename=f"logs/log_loadData_{dt_string}.log",
-                        format=log_format, level=logging.DEBUG)
+                        format=log_format, level=logging.INFO)
     logger = logging.getLogger(__name__)
     
     logger.info("load_data_into_db")
