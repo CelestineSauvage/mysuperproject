@@ -68,10 +68,10 @@ with DAG(
                 Mount(
                     source=f'{
                         source_main_volume}/{data_folder_name}/{source_name}',
-                    target=f'/project/downloads_from_airflow/{source_name}',
+                    target=f'/project/{data_folder_name}/{source_name}',
                     type='bind'),
                 Mount(source=f'{source_main_volume}/{log_folder_name}',
-                      target='/project/logs', type='bind'),
+                      target=f'/project/{log_folder_name}', type='bind'),
             ],
             environment=source_environement
         )
@@ -89,10 +89,10 @@ with DAG(
                 Mount(
                     source=f'{
                         source_main_volume}/{data_folder_name}/{source_name}',
-                    target=f'/project/downloads_from_airflow/{source_name}',
+                    target=f'/project/{data_folder_name}/{source_name}',
                     type='bind'),
                 Mount(source=f'{source_main_volume}/{log_folder_name}',
-                      target='/project/logs',
+                      target=f'/project/{log_folder_name}',
                       type='bind'),
             ],
             environment=source_environement
@@ -111,10 +111,10 @@ with DAG(
                 Mount(
                     source=f'{
                         source_main_volume}/{data_folder_name}/{source_name}',
-                    target=f'/project/downloads_from_airflow/{source_name}',
+                    target=f'/project/{data_folder_name}/{source_name}',
                     type='bind'),
                 Mount(source=f'{source_main_volume}/{log_folder_name}',
-                      target='/project/logs',
+                      target=f'/project/{log_folder_name}',
                       type='bind'),
             ],
             environment={
