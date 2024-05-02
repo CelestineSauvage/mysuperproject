@@ -16,14 +16,10 @@ sudo docker image build -t etl_extract:1.0.0 -f src/extract/Dockerfile .
 # FRANCE_EMPLOI_CLIENT_SECRET=cdde83cbc9fb9d77ceb336af8d0dbacc1c11aaab3cd302f70792ab3c3a338e50
 
 # Container creation
-# sudo docker container run \
-#     --rm \
-#     --env-file=extract_file_env \
-#     -it \
-#     -v etl_volume:/project/downloads/FT \
-#     etl_extract:latest
-#     #    
-    # etl_extract:latest
+sudo docker container run \
+    --rm \
+    --env-file=extract_file_env \
+    etl_extract:2.0.0
 
 ##########
 # TRANSFORM
