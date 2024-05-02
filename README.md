@@ -178,6 +178,14 @@ mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/
 
 
 # Initiate airflow db:
+
+
+echo -e "AIRFLOW_UID=$(id -u)" >> .env
+echo -e "AIRFLOW_GID=0" >> .env
+mkdir -p "$SOURCE_MAIN_VOLUME"/"$LOG_FOLDER_NAME"
+mkdir -p "$SOURCE_MAIN_VOLUME"/"$DATA_FOLDER_NAME"/FT
+mkdir -p "$SOURCE_MAIN_VOLUME"/"$DATA_FOLDER_NAME"/APEC
+
 sudo docker compose up airflow-init
 <!-- Run the docker compose -->
 sudo docker compose up -d
