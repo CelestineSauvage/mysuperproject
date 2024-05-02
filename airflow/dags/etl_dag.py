@@ -62,7 +62,7 @@ with DAG(
             api_version='auto',
             auto_remove=True,
             docker_url='tcp://docker-proxy:2375',
-            network_mode="airflow_airflow-jobmarket",
+            network_mode="fev24-bde-jobmarket_airflow-jobmarket",
             mount_tmp_dir=False,
             mounts=[
                 Mount(
@@ -83,7 +83,7 @@ with DAG(
             api_version='auto',
             auto_remove=True,
             docker_url='tcp://docker-proxy:2375',
-            network_mode="airflow_airflow-jobmarket",
+            network_mode="fev24-bde-jobmarket_airflow-jobmarket",
             mount_tmp_dir=False,
             mounts=[
                 Mount(
@@ -105,7 +105,7 @@ with DAG(
             api_version='auto',
             auto_remove=True,
             docker_url='tcp://docker-proxy:2375',
-            network_mode="airflow_airflow-jobmarket",
+            network_mode="fev24-bde-jobmarket_airflow-jobmarket",
             mount_tmp_dir=False,
             mounts=[
                 Mount(
