@@ -91,6 +91,45 @@ services:
     ports:
       - '8081:8081' 
 
+  setupmongo:
+    container_name : addcollection
+    image : addcollection:1.0.0
+    depends_on:
+      database_mongodb : 
+        condition : service_started
+    networks : 
+      - airflow-jobmarket
+    env_file : 
+      .env
+  
+  fastapi:
+    container_name : jmfastapi
+    image : jmfastapi:1.0.0
+    depends_on:
+      setupmongo:
+        condition : service_completed_successfully
+    networks : 
+      - airflow-jobmarket
+    env_file : 
+      .env
+    ports:
+      - '8000:8000'
+    
+  dash:
+    container_name : jmdash
+    image : jmdash:1.0.0
+    depends_on:
+      fastapi:
+        condition : service_started
+    networks : 
+      - airflow-jobmarket
+    env_file : 
+      .env
+    ports:
+      - '8050:8050'    
+  
+  
+  
   postgres:
     image: postgres:13
     environment:
