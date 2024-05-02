@@ -36,12 +36,12 @@ sudo apt-get install python3.12-venv
 
 - Créer un environnement virtuel :
 ```shell script
-python3.12 -m venv .env 
+python3.12 -m venv .penv 
 ```
 
 - Activer l'environnement virtuel :
 ```shell script
-source .env/bin/activate
+source .penv/bin/activate
 ```
 
 - Installer les paquettages Python à l'aide de pip3 :
