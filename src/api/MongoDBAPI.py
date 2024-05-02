@@ -30,7 +30,7 @@ EXP_1_4 = FastApiConstants.EXP_1_4.value
 # initiate query class
 job_query = None
 
-
+MONGO_HOST = MongoDBConstants.MONGO_HOST.value
 MONGO_USER = MongoDBConstants.MONGO_ADMIN.value
 MONGO_PASS = MongoDBConstants.MONGO_ADMIN_PASS.value
 
@@ -43,19 +43,14 @@ JOB_COL_NAME = MongoDBConstants.JOB_COL_NAME.value
 async def lifespan(app: FastAPI):
     # BEFORE FASTAPI LAUNCHER
 
-    # Start client for mongodb
-    mongo_user = MONGO_USER
-    mongo_pass = MONGO_PASS
-    client = MongoBddInfra.Mongodb(mongo_user, mongo_pass)
+    # connect client to mongodb
+    client = MongoBddInfra.Mongodb(MONGO_HOST, MONGO_USER, MONGO_PASS)
 
     # load 2 collections
-    db_name = DB_NAME
-    job_name = JOB_COL_NAME
-    region = REGION_COL_NAME
 
-    db = client.client[db_name]
-    col_jobs = db[job_name]
-    col_region = db[region]
+    db = client.client[DB_NAME]
+    col_jobs = db[JOB_COL_NAME]
+    col_region = db[REGION_COL_NAME]
     global job_query
     job_query = JobQuery(col_jobs, col_region)
     yield
