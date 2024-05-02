@@ -1,12 +1,15 @@
 import requests
 import logging
+import os
+from retry import retry
 
 # setup logger
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=log_format, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-fast_api_uri = f"http://127.0.0.1:8000/jobmarket"
+FAST_API = "jmfastapi"
+fast_api_uri = f"http://{FAST_API}:8000/jobmarket"
 
 # Fonction d'appel de l'API d'obtention de la liste des départements
 
@@ -45,11 +48,14 @@ def get_job_number_for_dep_on_search(selected_department: str, search_text: str)
     return get(f"{fast_api_uri}/department/{selected_department}/search", "job number for department on search text", {"search": search_text})
 
 
+@retry((requests.exceptions.ConnectionError), tries=3, delay=1)
 def get(url: str, get_type: str, params: dict = None):
     try:
         response = requests.get(url, params=params)
         response.raise_for_status()
         return response.json()
+    except requests.exceptions.ConnectionError as errh:
+        raise errh
     except requests.exceptions.HTTPError as errh:
         logger.error(f"Unexpected status code occurred during the retrieval of {
                      get_type}", errh.args[0])

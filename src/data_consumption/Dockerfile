@@ -11,6 +11,7 @@ RUN pip3 install -r requirements.txt
 COPY src/data_consumption ./
 
 # Exposition du port 80 pour l'application
+ENV MONGO_HOST localhost
 EXPOSE 80
 
 # Commande par défaut à exécuter lorsque le conteneur démarre

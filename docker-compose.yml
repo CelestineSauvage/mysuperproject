@@ -32,6 +32,44 @@ services:
     ports:
       - '8081:8081' 
 
+  setupmongo:
+    container_name : addcollection
+    image : addcollection:1.0.0
+    depends_on:
+      database : 
+        condition : service_started
+    networks : 
+      - mongo-compose-network
+    env_file : 
+      .env
+
+  fastapi:
+    container_name : jmfastapi
+    image : jmfastapi:1.0.0
+    depends_on:
+      setupmongo:
+        condition : service_completed_successfully
+    networks : 
+      - mongo-compose-network
+    env_file : 
+      .env
+    ports:
+      - '8000:8000'
+
+  dash:
+    container_name : jmdash
+    image : jmdash:1.0.0
+    depends_on:
+      fastapi:
+        condition : service_started
+    networks : 
+      - mongo-compose-network
+    env_file : 
+      .env
+    ports:
+      - '8050:8050'
+
+
 networks:
   mongo-compose-network:
 
