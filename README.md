@@ -173,8 +173,8 @@ sudo docker image build -t etl_load_into_db:1.0.0 -f src/load/Dockerfile .
 
 ## Création des volumes de partages sur le host
 mkdir -p /home/lastrucci/Téléchargements/TEST_PROJECT/logs_from_airflow
-mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/FT"
-mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/APEC"
+<!-- mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/FT"
+mkdir -p "/home/lastrucci/Téléchargements/TEST_PROJECT/downloads_from_airflow/APEC" -->
 
 
 # Initiate airflow db:
@@ -189,3 +189,15 @@ mkdir -p "$SOURCE_MAIN_VOLUME"/"$DATA_FOLDER_NAME"/APEC
 sudo docker compose up airflow-init
 <!-- Run the docker compose -->
 sudo docker compose up -d
+
+
+
+<!-- DEPRECATED IMAGE -->
+https://docs.docker.com/engine/deprecated/
+https://docs.docker.com/engine/deprecated/#pushing-and-pulling-with-image-manifest-v2-schema-1
+https://docs.docker.com/config/daemon/systemd/
+cat /etc/systemd/system/docker.service.d/override.conf
+[Service]
+Environment="DOCKER_ENABLE_DEPRECATED_PULL_SCHEMA_1_IMAGE=true"
+sudo systemctl stop docker.service
+sudo systemctl stop docker.socket
